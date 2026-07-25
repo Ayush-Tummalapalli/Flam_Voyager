@@ -1,9 +1,14 @@
 'use client';
 
+import { useState } from 'react';
 import DayCard from './DayCard';
-import { MapPin, Calendar, Info, RefreshCw, AlertCircle } from 'lucide-react';
+import RefinementBar from './RefinementBar';
+import { MapPin, Calendar, RefreshCw, AlertCircle, Sparkles } from 'lucide-react';
 
 export default function ItineraryView({ itinerary, onUpdateItinerary, onReset }) {
+  const [isRefining, setIsRefining] = useState(false);
+  const [refineNotice, setRefineNotice] = useState(null);
+
   if (!itinerary) return null;
 
   const handleUpdateStops = (dayNumber, newStops) => {
@@ -20,6 +25,39 @@ export default function ItineraryView({ itinerary, onUpdateItinerary, onReset })
     });
   };
 
+  const handleRefine = async (instruction) => {
+    setIsRefining(true);
+    setRefineNotice(null);
+
+    try {
+      const response = await fetch('/api/refine', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          currentItinerary: itinerary,
+          instruction: instruction
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        throw new Error(data.error || 'Failed to refine itinerary.');
+      }
+
+      onUpdateItinerary(data.data);
+      setRefineNotice(`Refined based on: "${instruction}"`);
+
+      // Clear notice after 5 seconds
+      setTimeout(() => setRefineNotice(null), 5000);
+    } catch (err) {
+      console.error('Refinement error:', err);
+      alert(err.message || 'Could not refine itinerary. Please try again.');
+    } finally {
+      setIsRefining(false);
+    }
+  };
+
   return (
     <div className="space-y-6 animate-fadeIn">
       {/* Header Info Banner */}
@@ -33,6 +71,13 @@ export default function ItineraryView({ itinerary, onUpdateItinerary, onReset })
             <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-500/20 border border-amber-400/30 text-amber-300 rounded-full text-xs font-medium">
               <AlertCircle className="w-3.5 h-3.5" />
               <span>Offline / Demo Fallback Mode</span>
+            </div>
+          )}
+
+          {refineNotice && (
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 rounded-full text-xs font-medium animate-fadeIn">
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>{refineNotice}</span>
             </div>
           )}
 
@@ -67,6 +112,9 @@ export default function ItineraryView({ itinerary, onUpdateItinerary, onReset })
           </p>
         </div>
       </div>
+
+      {/* AI Refinement Bar Component */}
+      <RefinementBar onRefine={handleRefine} isRefining={isRefining} />
 
       {/* Days Breakdown */}
       <div className="space-y-6">
