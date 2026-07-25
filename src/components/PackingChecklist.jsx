@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Briefcase, CheckSquare, Square, Plus, FileText, Shirt, Zap, ShieldCheck } from 'lucide-react';
 
-export default function PackingChecklist({ packingChecklist, destination }) {
+export default function PackingChecklist({ packingChecklist, destination, darkMode }) {
   const [checkedItems, setCheckedItems] = useState({});
   const [customItems, setCustomItems] = useState([]);
   const [newItemText, setNewItemText] = useState('');
@@ -18,7 +18,6 @@ export default function PackingChecklist({ packingChecklist, destination }) {
     { key: 'essentials', label: 'Essentials', icon: ShieldCheck, items: packingChecklist.essentials || [] }
   ];
 
-  // Calculate total item count and packed count
   let totalItems = 0;
   let packedItems = 0;
 
@@ -51,21 +50,33 @@ export default function PackingChecklist({ packingChecklist, destination }) {
   };
 
   return (
-    <div className="bg-white/90 backdrop-blur-sm rounded-2xl border border-slate-200/90 p-5 sm:p-6 shadow-sm space-y-5">
-      <div className="flex items-center justify-between flex-wrap gap-2 border-b border-slate-100 pb-4">
-        <div className="flex items-center gap-2 text-indigo-700 font-bold text-base">
-          <Briefcase className="w-5 h-5 text-indigo-600" />
+    <div className={`rounded-2xl border p-5 sm:p-6 shadow-sm space-y-5 transition-all ${
+      darkMode
+        ? 'bg-slate-900/90 backdrop-blur-sm border-slate-800'
+        : 'bg-white/90 backdrop-blur-sm border-slate-200/90'
+    }`}>
+      <div className={`flex items-center justify-between flex-wrap gap-2 border-b pb-4 ${
+        darkMode ? 'border-slate-800' : 'border-slate-100'
+      }`}>
+        <div className={`flex items-center gap-2 font-bold text-base ${
+          darkMode ? 'text-indigo-400' : 'text-indigo-700'
+        }`}>
+          <Briefcase className="w-5 h-5 text-indigo-500" />
           <span>Interactive AI Packing Checklist for {destination}</span>
         </div>
 
         {/* Progress Pill */}
-        <div className="flex items-center gap-2 bg-indigo-50 border border-indigo-100 px-3 py-1 rounded-full text-xs font-semibold text-indigo-700">
+        <div className={`flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold border ${
+          darkMode
+            ? 'bg-indigo-950/80 border-indigo-800 text-indigo-300'
+            : 'bg-indigo-50 border-indigo-100 text-indigo-700'
+        }`}>
           <span>{packedItems} of {totalItems} items packed ({progressPercent}%)</span>
         </div>
       </div>
 
       {/* Progress Bar */}
-      <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+      <div className={`w-full h-2 rounded-full overflow-hidden ${darkMode ? 'bg-slate-800' : 'bg-slate-100'}`}>
         <div 
           className="bg-gradient-to-r from-indigo-500 to-emerald-500 h-full transition-all duration-300 rounded-full"
           style={{ width: `${progressPercent}%` }}
@@ -73,7 +84,7 @@ export default function PackingChecklist({ packingChecklist, destination }) {
       </div>
 
       {/* Category Tabs */}
-      <div className="flex flex-wrap gap-2 border-b border-slate-100 pb-3">
+      <div className={`flex flex-wrap gap-2 border-b pb-3 ${darkMode ? 'border-slate-800' : 'border-slate-100'}`}>
         {categories.map((cat) => {
           const Icon = cat.icon;
           const isSelected = selectedCategory === cat.key;
@@ -84,7 +95,9 @@ export default function PackingChecklist({ packingChecklist, destination }) {
               className={`px-3 py-1.5 rounded-xl text-xs font-semibold border flex items-center gap-1.5 transition-all ${
                 isSelected
                   ? 'bg-indigo-600 text-white border-indigo-600 shadow-xs'
-                  : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-indigo-50 hover:text-indigo-600'
+                  : darkMode
+                    ? 'bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700 hover:text-white'
+                    : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-indigo-50 hover:text-indigo-600'
               }`}
             >
               <Icon className="w-3.5 h-3.5" />
@@ -108,12 +121,16 @@ export default function PackingChecklist({ packingChecklist, destination }) {
                     onClick={() => toggleItem(item)}
                     className={`flex items-center gap-3 p-3 rounded-xl border transition-all cursor-pointer select-none ${
                       isChecked
-                        ? 'bg-emerald-50/60 border-emerald-200 text-slate-500 line-through'
-                        : 'bg-slate-50/50 border-slate-200 hover:bg-indigo-50/40 hover:border-indigo-200 text-slate-800 font-medium'
+                        ? darkMode
+                          ? 'bg-emerald-950/40 border-emerald-900 text-slate-500 line-through'
+                          : 'bg-emerald-50/60 border-emerald-200 text-slate-500 line-through'
+                        : darkMode
+                          ? 'bg-slate-800/60 border-slate-700 hover:bg-slate-800 text-slate-200 font-medium'
+                          : 'bg-slate-50/50 border-slate-200 hover:bg-indigo-50/40 hover:border-indigo-200 text-slate-800 font-medium'
                     }`}
                   >
                     {isChecked ? (
-                      <CheckSquare className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <CheckSquare className="w-4 h-4 text-emerald-500 shrink-0" />
                     ) : (
                       <Square className="w-4 h-4 text-slate-400 shrink-0" />
                     )}
@@ -126,7 +143,7 @@ export default function PackingChecklist({ packingChecklist, destination }) {
 
         {/* Custom Items Section if present */}
         {customItems.length > 0 && selectedCategory === 'essentials' && (
-          <div className="pt-2 space-y-2 border-t border-slate-100">
+          <div className={`pt-2 space-y-2 border-t ${darkMode ? 'border-slate-800' : 'border-slate-100'}`}>
             <span className="text-[10px] uppercase font-bold text-slate-400">Custom Added Items</span>
             {customItems.map((item, idx) => {
               const isChecked = Boolean(checkedItems[item]);
@@ -136,12 +153,16 @@ export default function PackingChecklist({ packingChecklist, destination }) {
                   onClick={() => toggleItem(item)}
                   className={`flex items-center gap-3 p-3 rounded-xl border transition-all cursor-pointer select-none ${
                     isChecked
-                      ? 'bg-emerald-50/60 border-emerald-200 text-slate-500 line-through'
-                      : 'bg-slate-50/50 border-slate-200 hover:bg-indigo-50/40 text-slate-800 font-medium'
+                      ? darkMode
+                        ? 'bg-emerald-950/40 border-emerald-900 text-slate-500 line-through'
+                        : 'bg-emerald-50/60 border-emerald-200 text-slate-500 line-through'
+                      : darkMode
+                        ? 'bg-slate-800/60 border-slate-700 text-slate-200 font-medium'
+                        : 'bg-slate-50/50 border-slate-200 hover:bg-indigo-50/40 text-slate-800 font-medium'
                   }`}
                 >
                   {isChecked ? (
-                    <CheckSquare className="w-4 h-4 text-emerald-600 shrink-0" />
+                    <CheckSquare className="w-4 h-4 text-emerald-500 shrink-0" />
                   ) : (
                     <Square className="w-4 h-4 text-slate-400 shrink-0" />
                   )}
@@ -160,7 +181,11 @@ export default function PackingChecklist({ packingChecklist, destination }) {
           value={newItemText}
           onChange={(e) => setNewItemText(e.target.value)}
           placeholder="Add your own custom packing item..."
-          className="flex-1 px-3.5 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500"
+          className={`flex-1 px-3.5 py-2 text-xs border rounded-xl outline-none ${
+            darkMode
+              ? 'bg-slate-800 border-slate-700 text-white placeholder:text-slate-500 focus:ring-2 focus:ring-indigo-500'
+              : 'bg-slate-50 border-slate-200 text-slate-800 focus:ring-2 focus:ring-indigo-500'
+          }`}
         />
         <button
           type="submit"

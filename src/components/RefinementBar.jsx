@@ -13,7 +13,7 @@ const REFINEMENT_PRESETS = [
   "📸 Photography Spots"
 ];
 
-export default function RefinementBar({ onRefine, isRefining }) {
+export default function RefinementBar({ onRefine, isRefining, darkMode }) {
   const [instruction, setInstruction] = useState('');
   const [targetBudget, setTargetBudget] = useState('');
 
@@ -41,18 +41,26 @@ export default function RefinementBar({ onRefine, isRefining }) {
   };
 
   return (
-    <div className="bg-gradient-to-r from-indigo-50 via-purple-50 to-pink-50 border border-indigo-100/80 rounded-2xl p-5 shadow-sm space-y-4">
+    <div className={`border rounded-2xl p-5 shadow-sm space-y-4 transition-all ${
+      darkMode
+        ? 'bg-gradient-to-r from-slate-900 via-indigo-950/40 to-slate-900 border-slate-800'
+        : 'bg-gradient-to-r from-indigo-50 via-purple-50 to-pink-50 border-indigo-100/80'
+    }`}>
       <div className="flex items-center justify-between flex-wrap gap-2">
-        <div className="flex items-center gap-2 text-indigo-700 font-bold text-sm">
-          <Wand2 className="w-4 h-4 text-indigo-600 animate-pulse" />
+        <div className="flex items-center gap-2 text-indigo-400 font-bold text-sm">
+          <Wand2 className="w-4 h-4 text-indigo-500 animate-pulse" />
           <span>Refine Itinerary & Adjust Budget</span>
         </div>
-        <span className="text-[11px] font-semibold px-2.5 py-0.5 bg-indigo-100/80 text-indigo-700 rounded-full">
+        <span className={`text-[11px] font-semibold px-2.5 py-0.5 rounded-full border ${
+          darkMode
+            ? 'bg-indigo-950 text-indigo-300 border-indigo-800'
+            : 'bg-indigo-100/80 text-indigo-700 border-indigo-200'
+        }`}>
           Per-Pax Budget Engine
         </span>
       </div>
 
-      <p className="text-xs text-slate-500">
+      <p className={`text-xs ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
         Click a quick preset or enter custom instructions to tweak budget tier, food options, or daily pace.
       </p>
 
@@ -64,7 +72,11 @@ export default function RefinementBar({ onRefine, isRefining }) {
             type="button"
             onClick={() => handleSelectPreset(preset)}
             disabled={isRefining}
-            className="px-3 py-1.5 bg-white hover:bg-indigo-600 hover:text-white text-slate-700 border border-indigo-200/80 rounded-full text-xs font-semibold transition-all shadow-xs disabled:opacity-50 hover:shadow-sm hover:border-indigo-600"
+            className={`px-3 py-1.5 rounded-full text-xs font-semibold border transition-all shadow-xs disabled:opacity-50 ${
+              darkMode
+                ? 'bg-slate-800 hover:bg-indigo-600 hover:text-white text-slate-200 border-slate-700'
+                : 'bg-white hover:bg-indigo-600 hover:text-white text-slate-700 border-indigo-200/80'
+            }`}
           >
             {preset}
           </button>
@@ -85,7 +97,11 @@ export default function RefinementBar({ onRefine, isRefining }) {
               onChange={(e) => setTargetBudget(e.target.value)}
               placeholder="Budget/pax"
               disabled={isRefining}
-              className="w-full pl-8 pr-3 py-2.5 text-sm bg-white border border-indigo-200 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 placeholder:text-slate-400 text-slate-800 disabled:opacity-50"
+              className={`w-full pl-8 pr-3 py-2.5 text-sm rounded-xl outline-none border transition-all disabled:opacity-50 ${
+                darkMode
+                  ? 'bg-slate-800 border-slate-700 text-white placeholder:text-slate-500 focus:ring-2 focus:ring-indigo-500'
+                  : 'bg-white border-indigo-200 text-slate-800 placeholder:text-slate-400 focus:ring-2 focus:ring-indigo-500'
+              }`}
             />
           </div>
 
@@ -96,7 +112,11 @@ export default function RefinementBar({ onRefine, isRefining }) {
             onChange={(e) => setInstruction(e.target.value)}
             placeholder="E.g., 'Make day 2 budget friendly' or 'Add seafood dining'"
             disabled={isRefining}
-            className="flex-1 px-4 py-2.5 text-sm bg-white border border-indigo-200 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 placeholder:text-slate-400 text-slate-800 disabled:opacity-50"
+            className={`flex-1 px-4 py-2.5 text-sm rounded-xl outline-none border transition-all disabled:opacity-50 ${
+              darkMode
+                ? 'bg-slate-800 border-slate-700 text-white placeholder:text-slate-500 focus:ring-2 focus:ring-indigo-500'
+                : 'bg-white border-indigo-200 text-slate-800 placeholder:text-slate-400 focus:ring-2 focus:ring-indigo-500'
+            }`}
           />
 
           <button

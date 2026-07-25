@@ -4,7 +4,7 @@ import { useState } from 'react';
 import StopItem from './StopItem';
 import { Plus } from 'lucide-react';
 
-export default function DayCard({ day, destination, currency, onUpdateStops }) {
+export default function DayCard({ day, destination, currency, darkMode, onUpdateStops }) {
   const [isAdding, setIsAdding] = useState(false);
   const [newTitle, setNewTitle] = useState('');
   const [newTime, setNewTime] = useState('');
@@ -56,18 +56,28 @@ export default function DayCard({ day, destination, currency, onUpdateStops }) {
   };
 
   return (
-    <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-slate-200/80 p-5 shadow-sm space-y-4">
+    <div className={`rounded-2xl border p-5 shadow-sm space-y-4 transition-all ${
+      darkMode
+        ? 'bg-slate-900/80 backdrop-blur-sm border-slate-800'
+        : 'bg-white/80 backdrop-blur-sm border-slate-200/80'
+    }`}>
       {/* Day Header */}
-      <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+      <div className={`flex items-center justify-between border-b pb-3 ${
+        darkMode ? 'border-slate-800' : 'border-slate-100'
+      }`}>
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-indigo-50 border border-indigo-100 text-indigo-600 font-bold flex items-center justify-center text-sm">
+          <div className={`w-9 h-9 rounded-xl font-bold flex items-center justify-center text-sm border ${
+            darkMode
+              ? 'bg-indigo-950/80 border-indigo-800 text-indigo-300'
+              : 'bg-indigo-50 border-indigo-100 text-indigo-600'
+          }`}>
             {day.dayNumber}
           </div>
           <div>
-            <h3 className="font-bold text-slate-800 text-lg leading-snug">
+            <h3 className={`font-bold text-lg leading-snug ${darkMode ? 'text-white' : 'text-slate-800'}`}>
               {day.title}
             </h3>
-            <span className="text-xs text-slate-400 font-medium">
+            <span className={`text-xs font-medium ${darkMode ? 'text-slate-400' : 'text-slate-400'}`}>
               {day.stops.length} {day.stops.length === 1 ? 'Stop' : 'Stops'} planned
             </span>
           </div>
@@ -75,7 +85,11 @@ export default function DayCard({ day, destination, currency, onUpdateStops }) {
 
         <button
           onClick={() => setIsAdding(!isAdding)}
-          className="px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 rounded-lg text-xs font-semibold flex items-center gap-1 transition-colors"
+          className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1 transition-colors ${
+            darkMode
+              ? 'bg-indigo-950/80 hover:bg-indigo-900 border border-indigo-800 text-indigo-300'
+              : 'bg-indigo-50 hover:bg-indigo-100 text-indigo-600'
+          }`}
         >
           <Plus className="w-3.5 h-3.5" />
           <span>Add Stop</span>
@@ -84,15 +98,19 @@ export default function DayCard({ day, destination, currency, onUpdateStops }) {
 
       {/* Add Custom Stop Form */}
       {isAdding && (
-        <form onSubmit={handleAddStop} className="p-4 bg-slate-50 border border-indigo-100 rounded-xl space-y-3">
-          <h4 className="text-xs font-bold text-indigo-700 uppercase tracking-wider">New Activity</h4>
+        <form onSubmit={handleAddStop} className={`p-4 rounded-xl border space-y-3 ${
+          darkMode ? 'bg-slate-800 border-indigo-900/60' : 'bg-slate-50 border-indigo-100'
+        }`}>
+          <h4 className="text-xs font-bold text-indigo-400 uppercase tracking-wider">New Activity</h4>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
             <input
               type="text"
               placeholder="Activity / Place title *"
               value={newTitle}
               onChange={(e) => setNewTitle(e.target.value)}
-              className="px-3 py-2 text-sm bg-white border border-slate-200 rounded-lg outline-none focus:ring-1 focus:ring-indigo-500"
+              className={`px-3 py-2 text-sm rounded-lg outline-none focus:ring-1 focus:ring-indigo-500 border ${
+                darkMode ? 'bg-slate-900 border-slate-700 text-white' : 'bg-white border-slate-200 text-slate-800'
+              }`}
               required
             />
             <input
@@ -100,14 +118,18 @@ export default function DayCard({ day, destination, currency, onUpdateStops }) {
               placeholder="Time (e.g., 02:00 PM)"
               value={newTime}
               onChange={(e) => setNewTime(e.target.value)}
-              className="px-3 py-2 text-sm bg-white border border-slate-200 rounded-lg outline-none focus:ring-1 focus:ring-indigo-500"
+              className={`px-3 py-2 text-sm rounded-lg outline-none focus:ring-1 focus:ring-indigo-500 border ${
+                darkMode ? 'bg-slate-900 border-slate-700 text-white' : 'bg-white border-slate-200 text-slate-800'
+              }`}
             />
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
             <select
               value={newCategory}
               onChange={(e) => setNewCategory(e.target.value)}
-              className="px-3 py-2 text-sm bg-white border border-slate-200 rounded-lg outline-none focus:ring-1 focus:ring-indigo-500"
+              className={`px-3 py-2 text-sm rounded-lg outline-none focus:ring-1 focus:ring-indigo-500 border ${
+                darkMode ? 'bg-slate-900 border-slate-700 text-white' : 'bg-white border-slate-200 text-slate-800'
+              }`}
             >
               <option value="Sightseeing">Sightseeing</option>
               <option value="Food">Food</option>
@@ -121,14 +143,16 @@ export default function DayCard({ day, destination, currency, onUpdateStops }) {
               placeholder="Short description / tips"
               value={newDescription}
               onChange={(e) => setNewDescription(e.target.value)}
-              className="px-3 py-2 text-sm bg-white border border-slate-200 rounded-lg outline-none focus:ring-1 focus:ring-indigo-500"
+              className={`px-3 py-2 text-sm rounded-lg outline-none focus:ring-1 focus:ring-indigo-500 border ${
+                darkMode ? 'bg-slate-900 border-slate-700 text-white' : 'bg-white border-slate-200 text-slate-800'
+              }`}
             />
           </div>
           <div className="flex justify-end gap-2 pt-1">
             <button
               type="button"
               onClick={() => setIsAdding(false)}
-              className="px-3 py-1.5 text-xs text-slate-500 hover:text-slate-700"
+              className={`px-3 py-1.5 text-xs ${darkMode ? 'text-slate-400 hover:text-white' : 'text-slate-500 hover:text-slate-700'}`}
             >
               Cancel
             </button>
@@ -144,7 +168,9 @@ export default function DayCard({ day, destination, currency, onUpdateStops }) {
 
       {/* List of Stops */}
       {day.stops.length === 0 ? (
-        <div className="py-6 text-center text-slate-400 border border-dashed border-slate-200 rounded-xl text-xs">
+        <div className={`py-6 text-center border border-dashed rounded-xl text-xs ${
+          darkMode ? 'text-slate-500 border-slate-800' : 'text-slate-400 border-slate-200'
+        }`}>
           No stops planned for this day. Click "Add Stop" to create one!
         </div>
       ) : (
@@ -155,6 +181,7 @@ export default function DayCard({ day, destination, currency, onUpdateStops }) {
               stop={stop}
               destination={destination}
               currency={currency}
+              darkMode={darkMode}
               isFirst={index === 0}
               isLast={index === day.stops.length - 1}
               onMoveUp={handleMoveUp}

@@ -17,7 +17,7 @@ const COMPANION_OPTIONS = [
   { label: '🥳 Group of Friends', value: 'Group of Friends' }
 ];
 
-export default function TripInputForm({ onSubmit, isLoading }) {
+export default function TripInputForm({ onSubmit, isLoading, darkMode }) {
   const [prompt, setPrompt] = useState('');
   const [companionType, setCompanionType] = useState('Solo Traveler');
 
@@ -33,15 +33,21 @@ export default function TripInputForm({ onSubmit, isLoading }) {
   };
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 mb-8 transition-all space-y-4">
+    <div className={`rounded-2xl p-6 mb-8 transition-all space-y-4 border ${
+      darkMode
+        ? 'bg-slate-900 border-slate-800 shadow-xl'
+        : 'bg-white border-slate-100 shadow-sm'
+    }`}>
       <div className="flex items-center justify-between flex-wrap gap-2">
-        <div className="flex items-center gap-2 text-indigo-600 font-semibold text-sm">
+        <div className="flex items-center gap-2 text-indigo-500 font-semibold text-sm">
           <Sparkles className="w-4 h-4" />
           <span>Describe your ideal vacation</span>
         </div>
 
         {/* Companion Filter Selector Label */}
-        <div className="flex items-center gap-1.5 text-xs text-slate-500 font-medium">
+        <div className={`flex items-center gap-1.5 text-xs font-medium ${
+          darkMode ? 'text-slate-400' : 'text-slate-500'
+        }`}>
           <Users className="w-3.5 h-3.5 text-indigo-500" />
           <span>Who is traveling?</span>
         </div>
@@ -60,7 +66,9 @@ export default function TripInputForm({ onSubmit, isLoading }) {
               className={`px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all ${
                 isSelected
                   ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm'
-                  : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-indigo-50 hover:border-indigo-200 hover:text-indigo-600'
+                  : darkMode
+                    ? 'bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700 hover:text-white'
+                    : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-indigo-50 hover:border-indigo-200 hover:text-indigo-600'
               }`}
             >
               {option.label}
@@ -77,20 +85,30 @@ export default function TripInputForm({ onSubmit, isLoading }) {
             placeholder={`Where do you want to go as a ${companionType}? E.g., 'Planning a 4-day trip to Kyoto focusing on gardens, tea houses & peaceful walks...'`}
             rows={3}
             disabled={isLoading}
-            className="w-full px-4 py-3 text-slate-800 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none resize-none text-base placeholder:text-slate-400 transition-all disabled:opacity-50"
+            className={`w-full px-4 py-3 border rounded-xl outline-none resize-none text-base transition-all disabled:opacity-50 ${
+              darkMode
+                ? 'bg-slate-800/80 border-slate-700 text-white placeholder:text-slate-500 focus:ring-2 focus:ring-indigo-500'
+                : 'bg-slate-50 border-slate-200 text-slate-800 placeholder:text-slate-400 focus:ring-2 focus:ring-indigo-500'
+            }`}
           />
         </div>
 
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2 text-xs text-slate-500 flex-wrap">
-            <span className="font-medium text-slate-600">Try an example:</span>
+          <div className="flex items-center gap-2 text-xs flex-wrap">
+            <span className={`font-medium ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+              Try an example:
+            </span>
             {PRESET_PROMPTS.map((preset, idx) => (
               <button
                 key={idx}
                 type="button"
                 onClick={() => handleSelectPreset(preset)}
                 disabled={isLoading}
-                className="px-2.5 py-1 bg-slate-100 hover:bg-indigo-50 text-slate-700 hover:text-indigo-600 rounded-lg transition-colors text-xs disabled:opacity-50"
+                className={`px-2.5 py-1 rounded-lg transition-colors text-xs disabled:opacity-50 ${
+                  darkMode
+                    ? 'bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white'
+                    : 'bg-slate-100 text-slate-700 hover:bg-indigo-50 hover:text-indigo-600'
+                }`}
               >
                 {preset.split(' ')[2]} {preset.split(' ')[3]}
               </button>
@@ -100,7 +118,7 @@ export default function TripInputForm({ onSubmit, isLoading }) {
           <button
             type="submit"
             disabled={!prompt.trim() || isLoading}
-            className="w-full sm:w-auto px-6 py-3 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white font-medium rounded-xl shadow-md shadow-indigo-200 flex items-center justify-center gap-2 transition-all disabled:opacity-50 disabled:shadow-none"
+            className="w-full sm:w-auto px-6 py-3 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white font-medium rounded-xl shadow-md shadow-indigo-500/20 flex items-center justify-center gap-2 transition-all disabled:opacity-50 disabled:shadow-none"
           >
             {isLoading ? (
               <>

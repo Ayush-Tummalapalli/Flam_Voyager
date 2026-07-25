@@ -7,7 +7,7 @@ import PackingChecklist from './PackingChecklist';
 import { CURRENCIES, convertCurrencyString } from '@/lib/currencyConverter';
 import { MapPin, Calendar, RefreshCw, AlertCircle, Sparkles, DollarSign, AlertTriangle, PieChart, SunMedium, Thermometer, Briefcase, Users, Printer, Share2, Check, Globe } from 'lucide-react';
 
-export default function ItineraryView({ itinerary, onUpdateItinerary, onReset }) {
+export default function ItineraryView({ itinerary, onUpdateItinerary, onReset, darkMode }) {
   const [isRefining, setIsRefining] = useState(false);
   const [refineNotice, setRefineNotice] = useState(null);
   const [copiedShare, setCopiedShare] = useState(false);
@@ -105,15 +105,19 @@ export default function ItineraryView({ itinerary, onUpdateItinerary, onReset })
     <div className="space-y-6 animate-fadeIn">
       {/* Low Budget Warning Banner */}
       {itinerary.isBudgetTooLow && (
-        <div className="bg-amber-50 border border-amber-300 rounded-2xl p-5 text-amber-900 shadow-sm flex items-start gap-3 animate-fadeIn no-print">
-          <div className="p-2 bg-amber-100 rounded-xl text-amber-700 shrink-0">
+        <div className={`border rounded-2xl p-5 shadow-sm flex items-start gap-3 animate-fadeIn no-print ${
+          darkMode
+            ? 'bg-amber-950/60 border-amber-800 text-amber-200'
+            : 'bg-amber-50 border-amber-300 text-amber-900'
+        }`}>
+          <div className={`p-2 rounded-xl shrink-0 ${darkMode ? 'bg-amber-900 text-amber-300' : 'bg-amber-100 text-amber-700'}`}>
             <AlertTriangle className="w-5 h-5" />
           </div>
           <div className="space-y-1">
-            <h3 className="font-bold text-sm text-amber-950 flex items-center gap-2">
+            <h3 className="font-bold text-sm flex items-center gap-2">
               ⚠️ Given Budget is Too Low
             </h3>
-            <p className="text-xs sm:text-sm text-amber-800 leading-relaxed">
+            <p className="text-xs sm:text-sm leading-relaxed opacity-90">
               {itinerary.budgetWarning || `The requested budget is too low for a realistic trip to ${itinerary.destination}. Recommended minimum budget is $50/day per person.`}
             </p>
           </div>
@@ -121,7 +125,11 @@ export default function ItineraryView({ itinerary, onUpdateItinerary, onReset })
       )}
 
       {/* Header Info Banner */}
-      <div className="bg-gradient-to-br from-indigo-900 via-indigo-800 to-slate-900 text-white rounded-2xl p-6 sm:p-8 shadow-xl relative overflow-hidden space-y-5">
+      <div className={`rounded-2xl p-6 sm:p-8 shadow-xl relative overflow-hidden space-y-5 ${
+        darkMode
+          ? 'bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 text-white border border-slate-800'
+          : 'bg-gradient-to-br from-indigo-900 via-indigo-800 to-slate-900 text-white'
+      }`}>
         {/* Background glow effects */}
         <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl no-print" />
         <div className="absolute bottom-0 left-0 w-48 h-48 bg-purple-500/10 rounded-full blur-2xl no-print" />
@@ -311,13 +319,17 @@ export default function ItineraryView({ itinerary, onUpdateItinerary, onReset })
       </div>
 
       {/* Main Content View Switcher Tabs (Itinerary vs Packing List) */}
-      <div className="flex items-center gap-2 border-b border-slate-200 pb-3 no-print">
+      <div className={`flex items-center gap-2 border-b pb-3 no-print ${
+        darkMode ? 'border-slate-800' : 'border-slate-200'
+      }`}>
         <button
           onClick={() => setActiveTab('itinerary')}
           className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
             activeTab === 'itinerary'
               ? 'bg-indigo-600 text-white shadow-sm'
-              : 'bg-white text-slate-600 border border-slate-200 hover:bg-indigo-50 hover:text-indigo-600'
+              : darkMode
+                ? 'bg-slate-900 text-slate-300 border border-slate-800 hover:bg-slate-800'
+                : 'bg-white text-slate-600 border border-slate-200 hover:bg-indigo-50 hover:text-indigo-600'
           }`}
         >
           <Calendar className="w-4 h-4" />
@@ -329,7 +341,9 @@ export default function ItineraryView({ itinerary, onUpdateItinerary, onReset })
           className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
             activeTab === 'packing'
               ? 'bg-indigo-600 text-white shadow-sm'
-              : 'bg-white text-slate-600 border border-slate-200 hover:bg-indigo-50 hover:text-indigo-600'
+              : darkMode
+                ? 'bg-slate-900 text-slate-300 border border-slate-800 hover:bg-slate-800'
+                : 'bg-white text-slate-600 border border-slate-200 hover:bg-indigo-50 hover:text-indigo-600'
           }`}
         >
           <Briefcase className="w-4 h-4" />
@@ -342,7 +356,7 @@ export default function ItineraryView({ itinerary, onUpdateItinerary, onReset })
         <>
           {/* AI Refinement Bar Component */}
           <div className="no-print">
-            <RefinementBar onRefine={handleRefine} isRefining={isRefining} />
+            <RefinementBar onRefine={handleRefine} isRefining={isRefining} darkMode={darkMode} />
           </div>
 
           {/* Days Breakdown */}
@@ -353,6 +367,7 @@ export default function ItineraryView({ itinerary, onUpdateItinerary, onReset })
                 day={day}
                 destination={itinerary.destination}
                 currency={currency}
+                darkMode={darkMode}
                 onUpdateStops={handleUpdateStops}
               />
             ))}
@@ -363,6 +378,7 @@ export default function ItineraryView({ itinerary, onUpdateItinerary, onReset })
         <PackingChecklist
           packingChecklist={itinerary.packingChecklist}
           destination={itinerary.destination}
+          darkMode={darkMode}
         />
       )}
     </div>
