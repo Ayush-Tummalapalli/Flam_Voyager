@@ -3,11 +3,12 @@
 import { useState } from 'react';
 import DayCard from './DayCard';
 import RefinementBar from './RefinementBar';
-import { MapPin, Calendar, RefreshCw, AlertCircle, Sparkles, DollarSign, AlertTriangle, PieChart, SunMedium, Thermometer, Briefcase, Users } from 'lucide-react';
+import { MapPin, Calendar, RefreshCw, AlertCircle, Sparkles, DollarSign, AlertTriangle, PieChart, SunMedium, Thermometer, Briefcase, Users, Printer, Share2, Check } from 'lucide-react';
 
 export default function ItineraryView({ itinerary, onUpdateItinerary, onReset }) {
   const [isRefining, setIsRefining] = useState(false);
   const [refineNotice, setRefineNotice] = useState(null);
+  const [copiedShare, setCopiedShare] = useState(false);
 
   if (!itinerary) return null;
 
@@ -57,11 +58,38 @@ export default function ItineraryView({ itinerary, onUpdateItinerary, onReset })
     }
   };
 
+  const handleExportPDF = () => {
+    window.print();
+  };
+
+  const handleShareTrip = () => {
+    // Format itinerary into a clean WhatsApp / SMS text summary
+    let text = `✈️ *${itinerary.tripTitle}*\n`;
+    text += `📍 *Destination*: ${itinerary.destination}\n`;
+    text += `📅 *Duration*: ${itinerary.duration} (${itinerary.companionType || 'Solo Traveler'})\n`;
+    text += `💰 *Est. Budget*: ${itinerary.estimatedBudgetPerPax || 'N/A'}\n\n`;
+    text += `📝 *Summary*: ${itinerary.summary}\n\n`;
+
+    itinerary.days.forEach((day) => {
+      text += `🗓️ *DAY ${day.dayNumber}: ${day.title.toUpperCase()}*\n`;
+      day.stops.forEach((stop) => {
+        text += `• *${stop.time}* - ${stop.title} (${stop.category || 'Sightseeing'})\n  ${stop.description}\n`;
+      });
+      text += `\n`;
+    });
+
+    text += `🚀 *Planned with FlamVoyager*`;
+
+    navigator.clipboard.writeText(text);
+    setCopiedShare(true);
+    setTimeout(() => setCopiedShare(false), 4000);
+  };
+
   return (
     <div className="space-y-6 animate-fadeIn">
       {/* Low Budget Warning Banner */}
       {itinerary.isBudgetTooLow && (
-        <div className="bg-amber-50 border border-amber-300 rounded-2xl p-5 text-amber-900 shadow-sm flex items-start gap-3 animate-fadeIn">
+        <div className="bg-amber-50 border border-amber-300 rounded-2xl p-5 text-amber-900 shadow-sm flex items-start gap-3 animate-fadeIn no-print">
           <div className="p-2 bg-amber-100 rounded-xl text-amber-700 shrink-0">
             <AlertTriangle className="w-5 h-5" />
           </div>
@@ -79,8 +107,8 @@ export default function ItineraryView({ itinerary, onUpdateItinerary, onReset })
       {/* Header Info Banner */}
       <div className="bg-gradient-to-br from-indigo-900 via-indigo-800 to-slate-900 text-white rounded-2xl p-6 sm:p-8 shadow-xl relative overflow-hidden space-y-5">
         {/* Background glow effects */}
-        <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 left-0 w-48 h-48 bg-purple-500/10 rounded-full blur-2xl" />
+        <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl no-print" />
+        <div className="absolute bottom-0 left-0 w-48 h-48 bg-purple-500/10 rounded-full blur-2xl no-print" />
 
         <div className="relative z-10 space-y-4">
           <div className="flex items-center justify-between flex-wrap gap-2">
@@ -122,6 +150,13 @@ export default function ItineraryView({ itinerary, onUpdateItinerary, onReset })
             </div>
           )}
 
+          {copiedShare && (
+            <div className="inline-flex items-center gap-1.5 px-3.5 py-1 bg-teal-500/30 border border-teal-400/40 text-teal-200 rounded-full text-xs font-semibold animate-fadeIn">
+              <Check className="w-3.5 h-3.5 text-teal-300" />
+              <span>Itinerary copied to clipboard for WhatsApp/SMS!</span>
+            </div>
+          )}
+
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
               <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
@@ -139,13 +174,35 @@ export default function ItineraryView({ itinerary, onUpdateItinerary, onReset })
               </div>
             </div>
 
-            <button
-              onClick={onReset}
-              className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white text-xs font-semibold rounded-xl border border-white/20 flex items-center gap-1.5 transition-colors self-start sm:self-center"
-            >
-              <RefreshCw className="w-3.5 h-3.5" />
-              <span>New Plan</span>
-            </button>
+            {/* Action Bar: Export PDF, Share Trip, New Plan */}
+            <div className="flex items-center gap-2 flex-wrap self-start sm:self-center no-print">
+              <button
+                onClick={handleShareTrip}
+                title="Copy trip text summary for WhatsApp or messages"
+                className="px-3.5 py-2 bg-emerald-600/80 hover:bg-emerald-600 text-white text-xs font-semibold rounded-xl border border-emerald-400/30 flex items-center gap-1.5 transition-all shadow-sm"
+              >
+                {copiedShare ? <Check className="w-3.5 h-3.5 text-emerald-200" /> : <Share2 className="w-3.5 h-3.5" />}
+                <span>{copiedShare ? 'Copied!' : 'Share Trip'}</span>
+              </button>
+
+              <button
+                onClick={handleExportPDF}
+                title="Export or print itinerary to clean PDF"
+                className="px-3.5 py-2 bg-white/10 hover:bg-white/20 text-white text-xs font-semibold rounded-xl border border-white/20 flex items-center gap-1.5 transition-colors"
+              >
+                <Printer className="w-3.5 h-3.5" />
+                <span>Export PDF</span>
+              </button>
+
+              <button
+                onClick={onReset}
+                title="Start a new trip plan"
+                className="px-3.5 py-2 bg-white/10 hover:bg-white/20 text-white text-xs font-semibold rounded-xl border border-white/20 flex items-center gap-1.5 transition-colors"
+              >
+                <RefreshCw className="w-3.5 h-3.5" />
+                <span>New Plan</span>
+              </button>
+            </div>
           </div>
 
           <p className="text-sm text-indigo-100/80 pt-2 border-t border-indigo-700/50 leading-relaxed">
@@ -221,7 +278,9 @@ export default function ItineraryView({ itinerary, onUpdateItinerary, onReset })
       </div>
 
       {/* AI Refinement Bar Component */}
-      <RefinementBar onRefine={handleRefine} isRefining={isRefining} />
+      <div className="no-print">
+        <RefinementBar onRefine={handleRefine} isRefining={isRefining} />
+      </div>
 
       {/* Days Breakdown */}
       <div className="space-y-6">

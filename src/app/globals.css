@@ -16,3 +16,43 @@
 .animate-fadeIn {
   animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
+
+/* Print Styles for Exporting Clean PDF */
+@media print {
+  body {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+  }
+
+  header,
+  form,
+  button,
+  .no-print {
+    display: none !important;
+  }
+
+  main {
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  .max-w-4xl {
+    max-width: 100% !important;
+    width: 100% !important;
+  }
+
+  .shadow-xl, .shadow-md, .shadow-sm {
+    box-shadow: none !important;
+  }
+
+  .border {
+    border-color: #e2e8f0 !important;
+  }
+
+  .bg-gradient-to-br {
+    background: #1e1b4b !important;
+    color: #ffffff !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}
