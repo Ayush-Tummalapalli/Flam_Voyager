@@ -28,22 +28,30 @@ export async function POST(req) {
 You are an expert travel planner assistant.
 Generate a realistic, day-by-day travel itinerary based on the user request.
 
-IMPORTANT BUDGET INSTRUCTION:
-1. Estimate the total budget PER PERSON (per pax) in USD for the entire duration (including stay, food, activities).
-2. If the user explicitly asks for an unrealistically low budget (e.g. $10 or $20 total for a multi-day trip in major cities/destinations), set "isBudgetTooLow": true and provide a helpful "budgetWarning" string explaining that the given budget is too low and suggesting a realistic minimum (e.g., "Given budget ($20/pax) is too low for a 3-day trip to Tokyo. Recommended minimum budget is $180 per person.").
-3. Populate estimatedCost for each stop activity (e.g., "$15", "Free", "$40").
+REQUIRED SCHEMAS & FEATURES:
+1. Estimate total budget per person in USD (estimatedBudgetPerPax, budgetBreakdown: stay, food, activities).
+2. If user requests an unrealistically low budget (under $30/day), set isBudgetTooLow: true and budgetWarning string.
+3. Provide a "weatherAdvisor" object with:
+   - "bestSeason": string (e.g., "Nov to April (Dry & sunny)")
+   - "averageTemp": string (e.g., "28°C / 82°F")
+   - "packingTip": string (e.g., "Sunscreen, linen shirts, sunglasses & comfortable walking shoes")
 
 Required JSON Schema:
 {
   "tripTitle": "Catchy title for the trip",
   "destination": "City, Country",
   "duration": "X Days",
-  "summary": "Short 2-sentence summary of what this itinerary highlights",
+  "summary": "Short 2-sentence summary",
   "estimatedBudgetPerPax": "$XXX / person",
   "budgetBreakdown": {
     "stay": "$XXX",
     "food": "$XXX",
     "activities": "$XXX"
+  },
+  "weatherAdvisor": {
+    "bestSeason": "Best months / season to visit",
+    "averageTemp": "Average temperature",
+    "packingTip": "Key packing items"
   },
   "isBudgetTooLow": false,
   "budgetWarning": null,
@@ -56,9 +64,9 @@ Required JSON Schema:
           "id": "stop-1-1",
           "title": "Place / Activity Name",
           "time": "09:00 AM - 11:30 AM",
-          "description": "2-3 sentences explaining what to do here and insider tips",
+          "description": "2-3 sentences explaining what to do here",
           "category": "Sightseeing | Food | Culture | Relaxation | Shopping | Adventure",
-          "location": "Neighborhood or Landmark area",
+          "location": "Specific location or landmark name (e.g., Colosseum, Rome)",
           "estimatedCost": "$15 - $25"
         }
       ]
@@ -66,13 +74,13 @@ Required JSON Schema:
   ]
 }
 
-DO NOT include markdown, extra commentary, or code backticks. Return ONLY the raw JSON string.
+DO NOT include markdown or backticks. Return ONLY the raw JSON string.
 `;
 
     let responseText = null;
 
     if (apiKey.startsWith('gsk_')) {
-      console.log('Calling Groq API for generation with budget estimation...');
+      console.log('Calling Groq API with Weather & Budget features...');
       const groqRes = await fetch('https://api.groq.com/openai/v1/chat/completions', {
         method: 'POST',
         headers: {
@@ -98,7 +106,7 @@ DO NOT include markdown, extra commentary, or code backticks. Return ONLY the ra
       responseText = groqData.choices?.[0]?.message?.content;
 
     } else {
-      console.log('Calling Google Gemini API for generation...');
+      console.log('Calling Google Gemini API...');
       const genAI = new GoogleGenerativeAI(apiKey);
       const model = genAI.getGenerativeModel({
         model: 'gemini-1.5-flash',

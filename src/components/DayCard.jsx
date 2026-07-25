@@ -2,9 +2,9 @@
 
 import { useState } from 'react';
 import StopItem from './StopItem';
-import { Calendar, Plus } from 'lucide-react';
+import { Plus } from 'lucide-react';
 
-export default function DayCard({ day, onUpdateStops }) {
+export default function DayCard({ day, destination, onUpdateStops }) {
   const [isAdding, setIsAdding] = useState(false);
   const [newTitle, setNewTitle] = useState('');
   const [newTime, setNewTime] = useState('');
@@ -44,7 +44,7 @@ export default function DayCard({ day, onUpdateStops }) {
       time: newTime.trim() || 'Flexible Time',
       category: newCategory,
       description: newDescription.trim() || 'Custom added activity.',
-      location: ''
+      location: destination || ''
     };
 
     onUpdateStops(day.dayNumber, [...day.stops, newStopObj]);
@@ -152,6 +152,7 @@ export default function DayCard({ day, onUpdateStops }) {
             <StopItem
               key={stop.id}
               stop={stop}
+              destination={destination}
               isFirst={index === 0}
               isLast={index === day.stops.length - 1}
               onMoveUp={handleMoveUp}

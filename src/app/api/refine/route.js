@@ -43,22 +43,30 @@ ${JSON.stringify(existingItinerary, null, 2)}
 USER REFINEMENT INSTRUCTION:
 "${userInstruction}"
 
-CRITICAL BUDGET INSTRUCTIONS:
-1. If the user specifies a new budget target or range (e.g. "budget under $200 per pax" or "$50 per person"), update the itinerary activities, food choices, and stay estimates to match this target budget.
-2. If the user's requested budget is unrealistically low for this destination and trip length (e.g. $10 or $20 total for a multi-day trip), set "isBudgetTooLow": true and provide a clear "budgetWarning" string (e.g., "Given budget ($20/pax) is too low for a 3-day trip to Tokyo. Recommended minimum budget is $180 per person.").
-3. Re-calculate "estimatedBudgetPerPax" and "budgetBreakdown" (stay, food, activities).
+CRITICAL INSTRUCTIONS:
+1. Update the itinerary based on the user's refinement instruction.
+2. Preserve or update "weatherAdvisor" object with:
+   - "bestSeason": string
+   - "averageTemp": string
+   - "packingTip": string
+3. Preserve or update "estimatedBudgetPerPax" and "budgetBreakdown".
 
 Schema MUST match:
 {
   "tripTitle": "Title",
   "destination": "City, Country",
   "duration": "X Days",
-  "summary": "Updated summary reflecting the budget or activity changes made",
+  "summary": "Updated summary",
   "estimatedBudgetPerPax": "$XXX / person",
   "budgetBreakdown": {
     "stay": "$XXX",
     "food": "$XXX",
     "activities": "$XXX"
+  },
+  "weatherAdvisor": {
+    "bestSeason": "Best season",
+    "averageTemp": "Avg temp",
+    "packingTip": "Packing tip"
   },
   "isBudgetTooLow": false,
   "budgetWarning": null,
@@ -81,13 +89,13 @@ Schema MUST match:
   ]
 }
 
-Return ONLY the raw JSON object string with no markdown backticks.
+Return ONLY raw JSON.
 `;
 
     let responseText = null;
 
     if (apiKey.startsWith('gsk_')) {
-      console.log('Refining via Groq API engine with budget checks...');
+      console.log('Refining via Groq API engine with weather & budget features...');
       const groqRes = await fetch('https://api.groq.com/openai/v1/chat/completions', {
         method: 'POST',
         headers: {

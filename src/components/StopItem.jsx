@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { ChevronDown, ChevronUp, Trash2, ArrowUp, ArrowDown, MapPin, Clock, DollarSign } from 'lucide-react';
+import { ChevronDown, ChevronUp, Trash2, ArrowUp, ArrowDown, MapPin, Clock, DollarSign, ExternalLink } from 'lucide-react';
 
 const CATEGORY_COLORS = {
   Sightseeing: 'bg-blue-50 text-blue-700 border-blue-200',
@@ -13,10 +13,13 @@ const CATEGORY_COLORS = {
   General: 'bg-slate-50 text-slate-700 border-slate-200'
 };
 
-export default function StopItem({ stop, isFirst, isLast, onMoveUp, onMoveDown, onDelete }) {
+export default function StopItem({ stop, isFirst, isLast, onMoveUp, onMoveDown, onDelete, destination }) {
   const [isExpanded, setIsExpanded] = useState(false);
 
   const categoryStyle = CATEGORY_COLORS[stop.category] || CATEGORY_COLORS.General;
+  
+  const mapSearchQuery = encodeURIComponent(`${stop.title} ${stop.location || ''} ${destination || ''}`.trim());
+  const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${mapSearchQuery}`;
 
   return (
     <div className="group bg-white rounded-xl border border-slate-100 p-4 shadow-sm hover:shadow-md hover:border-indigo-100 transition-all">
@@ -47,10 +50,20 @@ export default function StopItem({ stop, isFirst, isLast, onMoveUp, onMoveDown, 
             {stop.title}
           </h4>
 
+          {/* Clickable Google Maps Location Link */}
           {stop.location && (
-            <div className="flex items-center gap-1 text-xs text-slate-500 mt-1">
-              <MapPin className="w-3.5 h-3.5 text-indigo-400" />
-              <span>{stop.location}</span>
+            <div className="mt-1" onClick={(e) => e.stopPropagation()}>
+              <a
+                href={googleMapsUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                title="Open in Google Maps"
+                className="inline-flex items-center gap-1 text-xs text-indigo-600 hover:text-indigo-800 hover:underline font-medium"
+              >
+                <MapPin className="w-3.5 h-3.5 text-indigo-500" />
+                <span>{stop.location}</span>
+                <ExternalLink className="w-3 h-3 text-indigo-400" />
+              </a>
             </div>
           )}
         </div>
@@ -95,8 +108,21 @@ export default function StopItem({ stop, isFirst, isLast, onMoveUp, onMoveDown, 
 
       {/* Expanded Description Details */}
       {isExpanded && (
-        <div className="mt-3 pt-3 border-t border-slate-100 text-sm text-slate-600 bg-slate-50/50 p-3 rounded-lg animate-fadeIn">
+        <div className="mt-3 pt-3 border-t border-slate-100 text-sm text-slate-600 bg-slate-50/50 p-3 rounded-lg animate-fadeIn space-y-2">
           <p className="leading-relaxed">{stop.description}</p>
+
+          <div className="pt-1">
+            <a
+              href={googleMapsUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 px-3 py-1 bg-white hover:bg-indigo-50 border border-slate-200 text-indigo-700 text-xs font-semibold rounded-lg transition-colors shadow-2xs"
+            >
+              <MapPin className="w-3.5 h-3.5 text-indigo-600" />
+              <span>View Location on Google Maps</span>
+              <ExternalLink className="w-3 h-3 text-indigo-400" />
+            </a>
+          </div>
         </div>
       )}
     </div>

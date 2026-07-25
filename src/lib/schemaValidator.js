@@ -1,6 +1,6 @@
 /**
  * Schema Validator & Normalizer for Travel Planner Itineraries.
- * Includes Budget Estimation per Pax and Budget Warning handling.
+ * Includes Weather & Season Advisor, Per-Pax Budget Estimation, and Budget Warning handling.
  */
 
 export function validateAndCleanItinerary(data) {
@@ -26,6 +26,17 @@ export function validateAndCleanItinerary(data) {
           activities: data.budgetBreakdown.activities || '$80'
         }
       : { stay: '$150', food: '$120', activities: '$80' },
+    weatherAdvisor: typeof data.weatherAdvisor === 'object' && data.weatherAdvisor !== null
+      ? {
+          bestSeason: data.weatherAdvisor.bestSeason || 'Spring & Autumn',
+          averageTemp: data.weatherAdvisor.averageTemp || '22°C / 72°F',
+          packingTip: data.weatherAdvisor.packingTip || 'Comfortable walking shoes & light layers'
+        }
+      : {
+          bestSeason: 'Spring & Autumn',
+          averageTemp: '22°C / 72°F',
+          packingTip: 'Comfortable walking shoes & light layers'
+        },
     isBudgetTooLow: Boolean(data.isBudgetTooLow),
     budgetWarning: typeof data.budgetWarning === 'string' ? data.budgetWarning : null,
     days: []

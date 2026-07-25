@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import DayCard from './DayCard';
 import RefinementBar from './RefinementBar';
-import { MapPin, Calendar, RefreshCw, AlertCircle, Sparkles, DollarSign, AlertTriangle, PieChart } from 'lucide-react';
+import { MapPin, Calendar, RefreshCw, AlertCircle, Sparkles, DollarSign, AlertTriangle, PieChart, SunMedium, Thermometer, Briefcase } from 'lucide-react';
 
 export default function ItineraryView({ itinerary, onUpdateItinerary, onReset }) {
   const [isRefining, setIsRefining] = useState(false);
@@ -76,7 +76,7 @@ export default function ItineraryView({ itinerary, onUpdateItinerary, onReset })
         </div>
       )}
 
-      {/* Header Info Banner with Permanent Budget Box */}
+      {/* Header Info Banner */}
       <div className="bg-gradient-to-br from-indigo-900 via-indigo-800 to-slate-900 text-white rounded-2xl p-6 sm:p-8 shadow-xl relative overflow-hidden space-y-5">
         {/* Background glow effects */}
         <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl" />
@@ -171,6 +171,42 @@ export default function ItineraryView({ itinerary, onUpdateItinerary, onReset })
               </div>
             </div>
           )}
+
+          {/* Weather & Season Advisor Card */}
+          {itinerary.weatherAdvisor && (
+            <div className="p-4 bg-gradient-to-r from-amber-500/10 to-indigo-500/10 backdrop-blur-md rounded-xl border border-white/10 space-y-2 text-xs">
+              <div className="flex items-center gap-1.5 font-bold text-amber-300">
+                <SunMedium className="w-4 h-4 text-amber-400" />
+                <span>Weather & Season Advisor for {itinerary.destination}</span>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1 text-slate-200">
+                <div className="flex items-center gap-2">
+                  <SunMedium className="w-4 h-4 text-amber-400 shrink-0" />
+                  <div>
+                    <span className="block text-[10px] text-indigo-300 font-semibold uppercase">Best Season</span>
+                    <span className="font-semibold text-white">{itinerary.weatherAdvisor.bestSeason}</span>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <Thermometer className="w-4 h-4 text-rose-400 shrink-0" />
+                  <div>
+                    <span className="block text-[10px] text-indigo-300 font-semibold uppercase">Avg Temp</span>
+                    <span className="font-semibold text-white">{itinerary.weatherAdvisor.averageTemp}</span>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2 sm:col-span-1">
+                  <Briefcase className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <div>
+                    <span className="block text-[10px] text-indigo-300 font-semibold uppercase">Packing Advice</span>
+                    <span className="font-semibold text-white leading-tight">{itinerary.weatherAdvisor.packingTip}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
@@ -183,6 +219,7 @@ export default function ItineraryView({ itinerary, onUpdateItinerary, onReset })
           <DayCard
             key={day.dayNumber}
             day={day}
+            destination={itinerary.destination}
             onUpdateStops={handleUpdateStops}
           />
         ))}
