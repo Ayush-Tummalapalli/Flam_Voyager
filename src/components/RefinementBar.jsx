@@ -1,14 +1,16 @@
 'use client';
 
 import { useState } from 'react';
-import { Sparkles, Send, Wand2, DollarSign } from 'lucide-react';
+import { Send, Wand2, DollarSign } from 'lucide-react';
 
 const REFINEMENT_PRESETS = [
-  "💰 Budget under $200/pax",
-  "💵 Moderate budget $500/pax",
-  "🥂 Luxury experience",
-  "🍜 Add vegetarian food spots",
-  "🌅 Add sunset viewing spots"
+  "💚 Low Budget",
+  "💙 Moderate Budget",
+  "💎 High Budget / Luxury",
+  "🍜 Food Feast",
+  "🧗 Adventurous & Thrill",
+  "🏖️ Beach & Relaxation",
+  "📸 Photography Spots"
 ];
 
 export default function RefinementBar({ onRefine, isRefining }) {
@@ -35,7 +37,7 @@ export default function RefinementBar({ onRefine, isRefining }) {
 
   const handleSelectPreset = (presetText) => {
     if (isRefining) return;
-    onRefine(presetText);
+    onRefine(`Refine itinerary to: ${presetText}`);
   };
 
   return (
@@ -51,18 +53,18 @@ export default function RefinementBar({ onRefine, isRefining }) {
       </div>
 
       <p className="text-xs text-slate-500">
-        Change budget targets, swap activities, or refine your daily pace without starting from scratch.
+        Click a quick preset or enter custom instructions to tweak budget tier, food options, or daily pace.
       </p>
 
       {/* Preset Suggestion Chips */}
-      <div className="flex flex-wrap gap-1.5">
+      <div className="flex flex-wrap gap-2">
         {REFINEMENT_PRESETS.map((preset, idx) => (
           <button
             key={idx}
             type="button"
             onClick={() => handleSelectPreset(preset)}
             disabled={isRefining}
-            className="px-2.5 py-1 bg-white hover:bg-indigo-600 hover:text-white text-slate-700 border border-indigo-100 rounded-full text-xs font-medium transition-all shadow-xs disabled:opacity-50"
+            className="px-3 py-1.5 bg-white hover:bg-indigo-600 hover:text-white text-slate-700 border border-indigo-200/80 rounded-full text-xs font-semibold transition-all shadow-xs disabled:opacity-50 hover:shadow-sm hover:border-indigo-600"
           >
             {preset}
           </button>
@@ -70,7 +72,7 @@ export default function RefinementBar({ onRefine, isRefining }) {
       </div>
 
       {/* Custom Refinement Form with Budget Box */}
-      <form onSubmit={handleSubmit} className="space-y-2">
+      <form onSubmit={handleSubmit} className="space-y-2 pt-1">
         <div className="flex flex-col sm:flex-row gap-2">
           {/* Target Budget per Pax Input */}
           <div className="relative sm:w-44">
