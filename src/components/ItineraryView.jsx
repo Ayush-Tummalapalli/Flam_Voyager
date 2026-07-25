@@ -3,12 +3,14 @@
 import { useState } from 'react';
 import DayCard from './DayCard';
 import RefinementBar from './RefinementBar';
-import { MapPin, Calendar, RefreshCw, AlertCircle, Sparkles, DollarSign, AlertTriangle, PieChart, SunMedium, Thermometer, Briefcase, Users, Printer, Share2, Check } from 'lucide-react';
+import { CURRENCIES, convertCurrencyString } from '@/lib/currencyConverter';
+import { MapPin, Calendar, RefreshCw, AlertCircle, Sparkles, DollarSign, AlertTriangle, PieChart, SunMedium, Thermometer, Briefcase, Users, Printer, Share2, Check, Globe } from 'lucide-react';
 
 export default function ItineraryView({ itinerary, onUpdateItinerary, onReset }) {
   const [isRefining, setIsRefining] = useState(false);
   const [refineNotice, setRefineNotice] = useState(null);
   const [copiedShare, setCopiedShare] = useState(false);
+  const [currency, setCurrency] = useState('USD');
 
   if (!itinerary) return null;
 
@@ -63,17 +65,21 @@ export default function ItineraryView({ itinerary, onUpdateItinerary, onReset })
   };
 
   const handleShareTrip = () => {
-    // Format itinerary into a clean WhatsApp / SMS text summary
+    const formattedBudget = itinerary.estimatedBudgetPerPax 
+      ? convertCurrencyString(itinerary.estimatedBudgetPerPax, currency) 
+      : 'N/A';
+
     let text = `✈️ *${itinerary.tripTitle}*\n`;
     text += `📍 *Destination*: ${itinerary.destination}\n`;
     text += `📅 *Duration*: ${itinerary.duration} (${itinerary.companionType || 'Solo Traveler'})\n`;
-    text += `💰 *Est. Budget*: ${itinerary.estimatedBudgetPerPax || 'N/A'}\n\n`;
+    text += `💰 *Est. Budget*: ${formattedBudget}\n\n`;
     text += `📝 *Summary*: ${itinerary.summary}\n\n`;
 
     itinerary.days.forEach((day) => {
       text += `🗓️ *DAY ${day.dayNumber}: ${day.title.toUpperCase()}*\n`;
       day.stops.forEach((stop) => {
-        text += `• *${stop.time}* - ${stop.title} (${stop.category || 'Sightseeing'})\n  ${stop.description}\n`;
+        const costStr = stop.estimatedCost ? ` [${convertCurrencyString(stop.estimatedCost, currency)}]` : '';
+        text += `• *${stop.time}* - ${stop.title}${costStr}\n  ${stop.description}\n`;
       });
       text += `\n`;
     });
@@ -84,6 +90,14 @@ export default function ItineraryView({ itinerary, onUpdateItinerary, onReset })
     setCopiedShare(true);
     setTimeout(() => setCopiedShare(false), 4000);
   };
+
+  const formattedTotalBudget = itinerary.estimatedBudgetPerPax 
+    ? convertCurrencyString(itinerary.estimatedBudgetPerPax, currency) 
+    : '$350 / person';
+
+  const formattedStay = itinerary.budgetBreakdown?.stay ? convertCurrencyString(itinerary.budgetBreakdown.stay, currency) : '$150';
+  const formattedFood = itinerary.budgetBreakdown?.food ? convertCurrencyString(itinerary.budgetBreakdown.food, currency) : '$120';
+  const formattedActivities = itinerary.budgetBreakdown?.activities ? convertCurrencyString(itinerary.budgetBreakdown.activities, currency) : '$80';
 
   return (
     <div className="space-y-6 animate-fadeIn">
@@ -134,13 +148,30 @@ export default function ItineraryView({ itinerary, onUpdateItinerary, onReset })
               )}
             </div>
 
-            {/* Per-Pax Total Budget Badge */}
-            {itinerary.estimatedBudgetPerPax && (
-              <div className="inline-flex items-center gap-1.5 px-3.5 py-1 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-full text-xs font-bold shadow-md shadow-emerald-900/30">
-                <DollarSign className="w-3.5 h-3.5" />
-                <span>Est. Budget: {itinerary.estimatedBudgetPerPax}</span>
+            {/* Currency Selector & Per-Pax Budget Badge */}
+            <div className="flex items-center gap-2 flex-wrap">
+              <div className="flex items-center gap-1 bg-white/10 border border-white/20 px-2 py-1 rounded-full text-xs no-print">
+                <Globe className="w-3.5 h-3.5 text-indigo-300" />
+                <select
+                  value={currency}
+                  onChange={(e) => setCurrency(e.target.value)}
+                  className="bg-transparent text-white text-xs font-bold outline-none cursor-pointer"
+                >
+                  {Object.values(CURRENCIES).map((curr) => (
+                    <option key={curr.code} value={curr.code} className="text-slate-800 font-semibold">
+                      {curr.flag} {curr.name}
+                    </option>
+                  ))}
+                </select>
               </div>
-            )}
+
+              {itinerary.estimatedBudgetPerPax && (
+                <div className="inline-flex items-center gap-1.5 px-3.5 py-1 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-full text-xs font-bold shadow-md shadow-emerald-900/30">
+                  <DollarSign className="w-3.5 h-3.5" />
+                  <span>Est. Budget: {formattedTotalBudget}</span>
+                </div>
+              )}
+            </div>
           </div>
 
           {refineNotice && (
@@ -215,7 +246,7 @@ export default function ItineraryView({ itinerary, onUpdateItinerary, onReset })
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-1.5 font-bold text-emerald-300">
                   <PieChart className="w-4 h-4 text-emerald-400" />
-                  <span>Estimated Budget Breakdown (per pax)</span>
+                  <span>Estimated Budget Breakdown (per pax in {currency})</span>
                 </div>
                 <span className="text-[10px] text-indigo-200 uppercase tracking-wider font-semibold">
                   End-to-End Estimate
@@ -225,15 +256,15 @@ export default function ItineraryView({ itinerary, onUpdateItinerary, onReset })
               <div className="grid grid-cols-3 gap-2.5 text-center pt-1">
                 <div className="p-2.5 bg-white/5 rounded-xl border border-white/5">
                   <span className="text-indigo-200 block text-[10px] font-medium">Stay & Hotel</span>
-                  <span className="font-extrabold text-base text-white">{itinerary.budgetBreakdown.stay}</span>
+                  <span className="font-extrabold text-base text-white">{formattedStay}</span>
                 </div>
                 <div className="p-2.5 bg-white/5 rounded-xl border border-white/5">
                   <span className="text-indigo-200 block text-[10px] font-medium">Food & Dining</span>
-                  <span className="font-extrabold text-base text-white">{itinerary.budgetBreakdown.food}</span>
+                  <span className="font-extrabold text-base text-white">{formattedFood}</span>
                 </div>
                 <div className="p-2.5 bg-white/5 rounded-xl border border-white/5">
                   <span className="text-indigo-200 block text-[10px] font-medium">Activities & Transport</span>
-                  <span className="font-extrabold text-base text-white">{itinerary.budgetBreakdown.activities}</span>
+                  <span className="font-extrabold text-base text-white">{formattedActivities}</span>
                 </div>
               </div>
             </div>
@@ -289,6 +320,7 @@ export default function ItineraryView({ itinerary, onUpdateItinerary, onReset })
             key={day.dayNumber}
             day={day}
             destination={itinerary.destination}
+            currency={currency}
             onUpdateStops={handleUpdateStops}
           />
         ))}

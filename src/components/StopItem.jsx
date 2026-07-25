@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { ChevronDown, ChevronUp, Trash2, ArrowUp, ArrowDown, MapPin, Clock, DollarSign, ExternalLink } from 'lucide-react';
+import { convertCurrencyString } from '@/lib/currencyConverter';
 
 const CATEGORY_COLORS = {
   Sightseeing: 'bg-blue-50 text-blue-700 border-blue-200',
@@ -13,13 +14,15 @@ const CATEGORY_COLORS = {
   General: 'bg-slate-50 text-slate-700 border-slate-200'
 };
 
-export default function StopItem({ stop, isFirst, isLast, onMoveUp, onMoveDown, onDelete, destination }) {
+export default function StopItem({ stop, isFirst, isLast, onMoveUp, onMoveDown, onDelete, destination, currency = 'USD' }) {
   const [isExpanded, setIsExpanded] = useState(false);
 
   const categoryStyle = CATEGORY_COLORS[stop.category] || CATEGORY_COLORS.General;
   
   const mapSearchQuery = encodeURIComponent(`${stop.title} ${stop.location || ''} ${destination || ''}`.trim());
   const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${mapSearchQuery}`;
+
+  const formattedCost = stop.estimatedCost ? convertCurrencyString(stop.estimatedCost, currency) : null;
 
   return (
     <div className="group bg-white rounded-xl border border-slate-100 p-4 shadow-sm hover:shadow-md hover:border-indigo-100 transition-all">
@@ -38,10 +41,10 @@ export default function StopItem({ stop, isFirst, isLast, onMoveUp, onMoveDown, 
               </span>
             )}
 
-            {stop.estimatedCost && (
+            {formattedCost && (
               <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center gap-0.5">
                 <DollarSign className="w-3 h-3" />
-                {stop.estimatedCost}
+                {formattedCost}
               </span>
             )}
           </div>
