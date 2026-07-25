@@ -1,6 +1,6 @@
 /**
  * Schema Validator & Normalizer for Travel Planner Itineraries.
- * Includes Companion Type, Weather & Season Advisor, Per-Pax Budget Estimation, and Budget Warning handling.
+ * Includes Packing Checklist, Companion Type, Weather Advisor, Per-Pax Budget Estimation, and Budget Warning handling.
  */
 
 export function validateAndCleanItinerary(data) {
@@ -39,6 +39,19 @@ export function validateAndCleanItinerary(data) {
           bestSeason: 'Spring & Autumn',
           averageTemp: '22°C / 72°F',
           packingTip: 'Comfortable walking shoes & light layers'
+        },
+    packingChecklist: typeof data.packingChecklist === 'object' && data.packingChecklist !== null
+      ? {
+          documents: Array.isArray(data.packingChecklist.documents) ? data.packingChecklist.documents : ['Passport & Visas', 'Travel Insurance Policy', 'Hotel & Booking Confirmations'],
+          clothing: Array.isArray(data.packingChecklist.clothing) ? data.packingChecklist.clothing : ['Comfortable walking shoes', 'Light cotton clothing', 'Weather-appropriate jacket'],
+          electronics: Array.isArray(data.packingChecklist.electronics) ? data.packingChecklist.electronics : ['Universal travel adapter', 'Power bank (10,000mAh+)', 'Phone charger & cables'],
+          essentials: Array.isArray(data.packingChecklist.essentials) ? data.packingChecklist.essentials : ['High SPF Sunscreen', 'Personal medication & first aid', 'Refillable water bottle']
+        }
+      : {
+          documents: ['Passport & Visas', 'Travel Insurance Policy', 'Hotel & Booking Confirmations'],
+          clothing: ['Comfortable walking shoes', 'Light cotton clothing', 'Weather-appropriate jacket'],
+          electronics: ['Universal travel adapter', 'Power bank (10,000mAh+)', 'Phone charger & cables'],
+          essentials: ['High SPF Sunscreen', 'Personal medication & first aid', 'Refillable water bottle']
         },
     isBudgetTooLow: Boolean(data.isBudgetTooLow),
     budgetWarning: typeof data.budgetWarning === 'string' ? data.budgetWarning : null,

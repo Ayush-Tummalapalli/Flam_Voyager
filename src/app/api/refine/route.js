@@ -49,7 +49,7 @@ USER REFINEMENT INSTRUCTION:
 
 CRITICAL INSTRUCTIONS:
 1. Update the itinerary based on the refinement instruction.
-2. If user requests changing companion vibe (e.g. to Family, Couple, Friends, Solo), update "companionType" and tailor activities accordingly.
+2. Preserve or update "packingChecklist" (documents, clothing, electronics, essentials).
 3. Preserve or update "weatherAdvisor", "estimatedBudgetPerPax", and "budgetBreakdown".
 
 Schema MUST match:
@@ -69,6 +69,12 @@ Schema MUST match:
     "bestSeason": "Best season",
     "averageTemp": "Avg temp",
     "packingTip": "Packing tip"
+  },
+  "packingChecklist": {
+    "documents": ["Item 1"],
+    "clothing": ["Item 1"],
+    "electronics": ["Item 1"],
+    "essentials": ["Item 1"]
   },
   "isBudgetTooLow": false,
   "budgetWarning": null,
@@ -97,7 +103,7 @@ Return ONLY raw JSON.
     let responseText = null;
 
     if (apiKey.startsWith('gsk_')) {
-      console.log('Refining via Groq API engine with companion support...');
+      console.log('Refining via Groq API engine with packing checklist...');
       const groqRes = await fetch('https://api.groq.com/openai/v1/chat/completions', {
         method: 'POST',
         headers: {

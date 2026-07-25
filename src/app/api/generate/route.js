@@ -30,22 +30,23 @@ export async function POST(req) {
 You are an expert travel planner assistant.
 Generate a realistic, day-by-day travel itinerary based on the user request.
 
-TRAVEL COMPANION FILTER:
-The user is traveling as: "${companionType}".
-Tailor all activities, pace, meal choices, and recommendations specifically for a "${companionType}" experience (e.g. kid-friendly activities for Families, romantic candlelit dinners for Couples, social hostels/walks for Solo travelers, or group adventures/nightlife for Friends).
-
 REQUIRED SCHEMAS & FEATURES:
 1. Include "companionType": "${companionType}".
 2. Estimate total budget per person in USD (estimatedBudgetPerPax, budgetBreakdown: stay, food, activities).
 3. If user requests an unrealistically low budget (under $30/day), set isBudgetTooLow: true and budgetWarning string.
 4. Provide a "weatherAdvisor" object (bestSeason, averageTemp, packingTip).
+5. Provide a destination & weather tailored "packingChecklist" object:
+   - "documents": Array of strings (e.g., ["Passport & Visas", "Travel Insurance Policy"])
+   - "clothing": Array of strings (e.g., ["Linen shirts", "Walking sneakers", "Swimwear"])
+   - "electronics": Array of strings (e.g., ["Universal Adapter", "Power Bank", "Camera Charger"])
+   - "essentials": Array of strings (e.g., ["High SPF Sunscreen", "Bug Spray", "Refillable Bottle"])
 
 Required JSON Schema:
 {
   "tripTitle": "Catchy title for the trip",
   "destination": "City, Country",
   "duration": "X Days",
-  "summary": "Short 2-sentence summary tailored to ${companionType}",
+  "summary": "Short 2-sentence summary",
   "companionType": "${companionType}",
   "estimatedBudgetPerPax": "$XXX / person",
   "budgetBreakdown": {
@@ -57,6 +58,12 @@ Required JSON Schema:
     "bestSeason": "Best season",
     "averageTemp": "Avg temp",
     "packingTip": "Packing tip"
+  },
+  "packingChecklist": {
+    "documents": ["Item 1", "Item 2"],
+    "clothing": ["Item 1", "Item 2"],
+    "electronics": ["Item 1", "Item 2"],
+    "essentials": ["Item 1", "Item 2"]
   },
   "isBudgetTooLow": false,
   "budgetWarning": null,
@@ -85,7 +92,7 @@ Return ONLY raw JSON.
     let responseText = null;
 
     if (apiKey.startsWith('gsk_')) {
-      console.log(`Calling Groq API for generation (${companionType})...`);
+      console.log(`Calling Groq API for generation with Packing Checklist...`);
       const groqRes = await fetch('https://api.groq.com/openai/v1/chat/completions', {
         method: 'POST',
         headers: {
@@ -111,7 +118,7 @@ Return ONLY raw JSON.
       responseText = groqData.choices?.[0]?.message?.content;
 
     } else {
-      console.log(`Calling Google Gemini API (${companionType})...`);
+      console.log(`Calling Google Gemini API...`);
       const genAI = new GoogleGenerativeAI(apiKey);
       const model = genAI.getGenerativeModel({
         model: 'gemini-1.5-flash',

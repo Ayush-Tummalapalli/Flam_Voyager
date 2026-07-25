@@ -1,5 +1,5 @@
 /**
- * Dynamic Smart Itinerary Generator with Companion Filters, Per-Pax Budget & Weather Advisor.
+ * Dynamic Smart Itinerary Generator with Packing Checklist, Companion Filters, Per-Pax Budget & Weather Advisor.
  */
 
 export function getMockItinerary(userPrompt, targetBudget = null, companionType = 'Solo Traveler') {
@@ -14,6 +14,13 @@ export function getMockItinerary(userPrompt, targetBudget = null, companionType 
     packingTip: 'Comfortable walking shoes, sunglasses & light layers.'
   };
 
+  let packingChecklist = {
+    documents: ['Passport & ID Cards', 'Flight & Hotel Bookings', 'Travel Medical Insurance'],
+    clothing: ['Comfortable sneakers / walking shoes', 'Breathable shirts & tops', 'Versatile jacket or sweater'],
+    electronics: ['Universal Plug Adapter', 'Power Bank (10,000mAh+)', 'Phone & Camera Chargers'],
+    essentials: ['High SPF Sunscreen', 'Refillable Water Bottle', 'Personal First Aid Kit']
+  };
+
   if (promptLower.includes('spain')) {
     destination = 'Spain';
     weatherAdvisor = {
@@ -21,6 +28,8 @@ export function getMockItinerary(userPrompt, targetBudget = null, companionType 
       averageTemp: '24°C / 75°F',
       packingTip: 'Sunscreen, comfortable walking shoes & breathable cotton clothing.'
     };
+    packingChecklist.clothing.push('Sun hat & sunglasses');
+    packingChecklist.essentials.push('Spanish phrasebook / translator app');
   } else if (promptLower.includes('netherlands') || promptLower.includes('amsterdam')) {
     destination = 'Netherlands';
     weatherAdvisor = {
@@ -28,6 +37,7 @@ export function getMockItinerary(userPrompt, targetBudget = null, companionType 
       averageTemp: '18°C / 64°F',
       packingTip: 'Compact umbrella, waterproof light jacket & walking sneakers.'
     };
+    packingChecklist.essentials.push('Windbreaker / Raincoat', 'Compact Travel Umbrella');
   } else if (promptLower.includes('phuket') || promptLower.includes('thailand')) {
     destination = 'Phuket, Thailand';
     weatherAdvisor = {
@@ -35,6 +45,8 @@ export function getMockItinerary(userPrompt, targetBudget = null, companionType 
       averageTemp: '30°C / 86°F',
       packingTip: 'Swimwear, flip flops, high SPF sunscreen & light linen shirts.'
     };
+    packingChecklist.clothing = ['Swimwear & Beach Cover-ups', 'Flip-flops & Sandals', 'Light Linen Shirts & Shorts'];
+    packingChecklist.essentials.push('Waterproof Phone Pouch', 'Mosquito Repellent Spray');
   } else if (promptLower.includes('paris') || promptLower.includes('france')) {
     destination = 'Paris, France';
     weatherAdvisor = {
@@ -42,6 +54,7 @@ export function getMockItinerary(userPrompt, targetBudget = null, companionType 
       averageTemp: '21°C / 70°F',
       packingTip: 'Stylish smart-casual outfits, comfortable shoes & light scarf.'
     };
+    packingChecklist.clothing = ['Smart Casual Evening Wear', 'Comfortable Walking Shoes', 'Light Trench Coat or Scarf'];
   } else if (promptLower.includes('tokyo') || promptLower.includes('japan')) {
     destination = 'Tokyo, Japan';
     weatherAdvisor = {
@@ -49,13 +62,8 @@ export function getMockItinerary(userPrompt, targetBudget = null, companionType 
       averageTemp: '19°C / 66°F',
       packingTip: 'Easy-to-remove walking shoes, portable charger & light jacket.'
     };
-  } else if (promptLower.includes('goa') || promptLower.includes('india')) {
-    destination = 'Goa, India';
-    weatherAdvisor = {
-      bestSeason: 'November to February (Sunny Beach Season)',
-      averageTemp: '29°C / 84°F',
-      packingTip: 'Beachwear, sunglasses, mosquito repellent & light cottons.'
-    };
+    packingChecklist.electronics.push('Pocket WiFi Router / eSIM');
+    packingChecklist.clothing.push('Slip-on Shoes (easy removal for shrines/restaurants)');
   }
 
   // Extract duration
@@ -88,64 +96,46 @@ export function getMockItinerary(userPrompt, targetBudget = null, companionType 
 
   const days = [];
   for (let i = 1; i <= daysCount; i++) {
-    let stop1Title = `Arrival & Exploring Sights in ${destination}`;
-    let stop2Title = 'Local Cuisine & Food Tasting';
-    let stop3Title = 'Sunset Viewpoint & Evening Walk';
-
-    if (companionType.includes('Family')) {
-      stop1Title = `Family Friendly Parks & Sights in ${destination}`;
-      stop2Title = 'Kid-Friendly Local Restaurant';
-      stop3Title = 'Interactive Science & Nature Park Walk';
-    } else if (companionType.includes('Couple')) {
-      stop1Title = `Romantic Old Town Stroll in ${destination}`;
-      stop2Title = 'Candlelit Local Bistro & Wine Tasting';
-      stop3Title = 'Scenic Sunset Panorama Viewpoint';
-    } else if (companionType.includes('Friends')) {
-      stop1Title = `Group Adventure & High Energy Sights in ${destination}`;
-      stop2Title = 'Vibrant Street Food & Craft Brewery Crawl';
-      stop3Title = 'Night Market & Live Music Lounge';
-    }
-
     const dayStops = [
       {
         id: `stop-${i}-1`,
-        title: stop1Title,
+        title: i === 1 ? `Arrival & Exploring Sights in ${destination}` : i === 2 ? 'Cultural Landmarks & Architecture' : 'Local Markets & Panoramics',
         time: '10:00 AM - 01:00 PM',
-        description: `Experience ${destination} tailored specifically for ${companionType}.`,
+        description: `Explore the vibrant streets, historic landmarks, and scenery of ${destination}.`,
         category: 'Sightseeing',
         location: destination,
         estimatedCost: '$15 - $25'
       },
       {
         id: `stop-${i}-2`,
-        title: stop2Title,
+        title: reqBudget && reqBudget < 400 ? 'Budget Street Food & Local Eateries' : 'Authentic Regional Dining',
         time: '01:30 PM - 03:00 PM',
-        description: `Sample regional food and dining spots suitable for ${companionType}.`,
+        description: `Sample regional culinary specialties and local delicacies.`,
         category: 'Food',
-        location: `${destination} Central District`,
+        location: `${destination} Central Market`,
         estimatedCost: reqBudget && reqBudget < 400 ? '$8 - $15' : '$25 - $40'
       },
       {
         id: `stop-${i}-3`,
-        title: stop3Title,
+        title: 'Sunset Viewpoint & Evening Stroll',
         time: '06:00 PM - 08:30 PM',
-        description: `Relax and wrap up day ${i} with an enjoyable evening atmosphere.`,
+        description: `Relax and take in panoramic views of ${destination}.`,
         category: 'Relaxation',
-        location: `${destination} Promenade`,
+        location: `${destination} Waterfront`,
         estimatedCost: 'Free'
       }
     ];
 
     days.push({
       dayNumber: i,
-      title: `Day ${i}: ${i === 1 ? 'Arrival & Key Highlights' : i === 2 ? 'Culture & Dining' : 'Excursions'}`,
+      title: `Day ${i}: ${i === 1 ? 'Arrival & Key Sights' : i === 2 ? 'Culture & Food' : 'Excursions'}`,
       stops: dayStops
     });
   }
 
   return {
     isMock: true,
-    tripTitle: `${daysCount}-Day ${destination} (${companionType} Edition)`,
+    tripTitle: `${daysCount}-Day ${destination} Experience`,
     destination: destination,
     duration: `${daysCount} Days`,
     summary: `A customized ${daysCount}-day itinerary for ${companionType} based on "${prompt}".`,
@@ -157,6 +147,7 @@ export function getMockItinerary(userPrompt, targetBudget = null, companionType 
       activities: `$${Math.round(estimatedTotalPerPax * 0.20)}`
     },
     weatherAdvisor: weatherAdvisor,
+    packingChecklist: packingChecklist,
     isBudgetTooLow: isBudgetTooLow,
     budgetWarning: budgetWarning,
     days: days

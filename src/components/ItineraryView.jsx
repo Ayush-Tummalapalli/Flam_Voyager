@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import DayCard from './DayCard';
 import RefinementBar from './RefinementBar';
+import PackingChecklist from './PackingChecklist';
 import { CURRENCIES, convertCurrencyString } from '@/lib/currencyConverter';
 import { MapPin, Calendar, RefreshCw, AlertCircle, Sparkles, DollarSign, AlertTriangle, PieChart, SunMedium, Thermometer, Briefcase, Users, Printer, Share2, Check, Globe } from 'lucide-react';
 
@@ -11,6 +12,7 @@ export default function ItineraryView({ itinerary, onUpdateItinerary, onReset })
   const [refineNotice, setRefineNotice] = useState(null);
   const [copiedShare, setCopiedShare] = useState(false);
   const [currency, setCurrency] = useState('USD');
+  const [activeTab, setActiveTab] = useState('itinerary'); // 'itinerary' | 'packing'
 
   if (!itinerary) return null;
 
@@ -308,23 +310,61 @@ export default function ItineraryView({ itinerary, onUpdateItinerary, onReset })
         </div>
       </div>
 
-      {/* AI Refinement Bar Component */}
-      <div className="no-print">
-        <RefinementBar onRefine={handleRefine} isRefining={isRefining} />
+      {/* Main Content View Switcher Tabs (Itinerary vs Packing List) */}
+      <div className="flex items-center gap-2 border-b border-slate-200 pb-3 no-print">
+        <button
+          onClick={() => setActiveTab('itinerary')}
+          className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
+            activeTab === 'itinerary'
+              ? 'bg-indigo-600 text-white shadow-sm'
+              : 'bg-white text-slate-600 border border-slate-200 hover:bg-indigo-50 hover:text-indigo-600'
+          }`}
+        >
+          <Calendar className="w-4 h-4" />
+          <span>Day-by-Day Schedule</span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab('packing')}
+          className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
+            activeTab === 'packing'
+              ? 'bg-indigo-600 text-white shadow-sm'
+              : 'bg-white text-slate-600 border border-slate-200 hover:bg-indigo-50 hover:text-indigo-600'
+          }`}
+        >
+          <Briefcase className="w-4 h-4" />
+          <span>🎒 Packing Checklist</span>
+        </button>
       </div>
 
-      {/* Days Breakdown */}
-      <div className="space-y-6">
-        {itinerary.days.map((day) => (
-          <DayCard
-            key={day.dayNumber}
-            day={day}
-            destination={itinerary.destination}
-            currency={currency}
-            onUpdateStops={handleUpdateStops}
-          />
-        ))}
-      </div>
+      {/* View Content based on activeTab */}
+      {activeTab === 'itinerary' ? (
+        <>
+          {/* AI Refinement Bar Component */}
+          <div className="no-print">
+            <RefinementBar onRefine={handleRefine} isRefining={isRefining} />
+          </div>
+
+          {/* Days Breakdown */}
+          <div className="space-y-6">
+            {itinerary.days.map((day) => (
+              <DayCard
+                key={day.dayNumber}
+                day={day}
+                destination={itinerary.destination}
+                currency={currency}
+                onUpdateStops={handleUpdateStops}
+              />
+            ))}
+          </div>
+        </>
+      ) : (
+        /* Interactive Packing Checklist Component */
+        <PackingChecklist
+          packingChecklist={itinerary.packingChecklist}
+          destination={itinerary.destination}
+        />
+      )}
     </div>
   );
 }
