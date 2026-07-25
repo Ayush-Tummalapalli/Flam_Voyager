@@ -1,0 +1,83 @@
+'use client';
+
+import DayCard from './DayCard';
+import { MapPin, Calendar, Info, RefreshCw, AlertCircle } from 'lucide-react';
+
+export default function ItineraryView({ itinerary, onUpdateItinerary, onReset }) {
+  if (!itinerary) return null;
+
+  const handleUpdateStops = (dayNumber, newStops) => {
+    const updatedDays = itinerary.days.map((day) => {
+      if (day.dayNumber === dayNumber) {
+        return { ...day, stops: newStops };
+      }
+      return day;
+    });
+
+    onUpdateItinerary({
+      ...itinerary,
+      days: updatedDays
+    });
+  };
+
+  return (
+    <div className="space-y-6 animate-fadeIn">
+      {/* Header Info Banner */}
+      <div className="bg-gradient-to-br from-indigo-900 via-indigo-800 to-slate-900 text-white rounded-2xl p-6 sm:p-8 shadow-xl relative overflow-hidden">
+        {/* Background glow effects */}
+        <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 left-0 w-48 h-48 bg-purple-500/10 rounded-full blur-2xl" />
+
+        <div className="relative z-10 space-y-3">
+          {itinerary.isMock && (
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-500/20 border border-amber-400/30 text-amber-300 rounded-full text-xs font-medium">
+              <AlertCircle className="w-3.5 h-3.5" />
+              <span>Offline / Demo Fallback Mode</span>
+            </div>
+          )}
+
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
+                {itinerary.tripTitle}
+              </h2>
+              <div className="flex items-center gap-4 text-xs sm:text-sm text-indigo-200 mt-2 flex-wrap">
+                <span className="flex items-center gap-1">
+                  <MapPin className="w-4 h-4 text-indigo-400" />
+                  {itinerary.destination}
+                </span>
+                <span className="flex items-center gap-1">
+                  <Calendar className="w-4 h-4 text-indigo-400" />
+                  {itinerary.duration}
+                </span>
+              </div>
+            </div>
+
+            <button
+              onClick={onReset}
+              className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white text-xs font-semibold rounded-xl border border-white/20 flex items-center gap-1.5 transition-colors self-start sm:self-center"
+            >
+              <RefreshCw className="w-3.5 h-3.5" />
+              <span>New Plan</span>
+            </button>
+          </div>
+
+          <p className="text-sm text-indigo-100/80 pt-2 border-t border-indigo-700/50 leading-relaxed">
+            {itinerary.summary}
+          </p>
+        </div>
+      </div>
+
+      {/* Days Breakdown */}
+      <div className="space-y-6">
+        {itinerary.days.map((day) => (
+          <DayCard
+            key={day.dayNumber}
+            day={day}
+            onUpdateStops={handleUpdateStops}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
