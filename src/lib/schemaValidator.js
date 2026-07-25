@@ -1,6 +1,6 @@
 /**
  * Schema Validator & Normalizer for Travel Planner Itineraries.
- * Protects the UI against unexpected LLM output formats, missing fields, or malformed JSON.
+ * Includes Budget Estimation per Pax and Budget Warning handling.
  */
 
 export function validateAndCleanItinerary(data) {
@@ -16,6 +16,18 @@ export function validateAndCleanItinerary(data) {
     destination: typeof data.destination === 'string' ? data.destination : 'Destination',
     duration: typeof data.duration === 'string' ? data.duration : 'Multi-day Trip',
     summary: typeof data.summary === 'string' ? data.summary : 'An itinerary tailored to your preferences.',
+    estimatedBudgetPerPax: typeof data.estimatedBudgetPerPax === 'string' && data.estimatedBudgetPerPax.trim() !== ''
+      ? data.estimatedBudgetPerPax
+      : '$350 / person',
+    budgetBreakdown: typeof data.budgetBreakdown === 'object' && data.budgetBreakdown !== null
+      ? {
+          stay: data.budgetBreakdown.stay || '$150',
+          food: data.budgetBreakdown.food || '$120',
+          activities: data.budgetBreakdown.activities || '$80'
+        }
+      : { stay: '$150', food: '$120', activities: '$80' },
+    isBudgetTooLow: Boolean(data.isBudgetTooLow),
+    budgetWarning: typeof data.budgetWarning === 'string' ? data.budgetWarning : null,
     days: []
   };
 
@@ -47,7 +59,8 @@ export function validateAndCleanItinerary(data) {
           ? stop.description 
           : 'Enjoy exploring this spot.',
         category: typeof stop.category === 'string' ? stop.category : 'General',
-        location: typeof stop.location === 'string' ? stop.location : ''
+        location: typeof stop.location === 'string' ? stop.location : '',
+        estimatedCost: typeof stop.estimatedCost === 'string' ? stop.estimatedCost : 'Free'
       };
     });
 

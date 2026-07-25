@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { ChevronDown, ChevronUp, Trash2, ArrowUp, ArrowDown, MapPin, Clock, Tag } from 'lucide-react';
+import { ChevronDown, ChevronUp, Trash2, ArrowUp, ArrowDown, MapPin, Clock, DollarSign } from 'lucide-react';
 
 const CATEGORY_COLORS = {
   Sightseeing: 'bg-blue-50 text-blue-700 border-blue-200',
@@ -32,6 +32,13 @@ export default function StopItem({ stop, isFirst, isLast, onMoveUp, onMoveDown, 
             {stop.category && (
               <span className={`text-xs font-medium px-2.5 py-0.5 rounded-full border ${categoryStyle}`}>
                 {stop.category}
+              </span>
+            )}
+
+            {stop.estimatedCost && (
+              <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center gap-0.5">
+                <DollarSign className="w-3 h-3" />
+                {stop.estimatedCost}
               </span>
             )}
           </div>

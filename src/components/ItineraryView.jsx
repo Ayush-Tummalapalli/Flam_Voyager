@@ -3,11 +3,12 @@
 import { useState } from 'react';
 import DayCard from './DayCard';
 import RefinementBar from './RefinementBar';
-import { MapPin, Calendar, RefreshCw, AlertCircle, Sparkles } from 'lucide-react';
+import { MapPin, Calendar, RefreshCw, AlertCircle, Sparkles, DollarSign, AlertTriangle, PieChart } from 'lucide-react';
 
 export default function ItineraryView({ itinerary, onUpdateItinerary, onReset }) {
   const [isRefining, setIsRefining] = useState(false);
   const [refineNotice, setRefineNotice] = useState(null);
+  const [showBudgetDetails, setShowBudgetDetails] = useState(false);
 
   if (!itinerary) return null;
 
@@ -48,7 +49,6 @@ export default function ItineraryView({ itinerary, onUpdateItinerary, onReset })
       onUpdateItinerary(data.data);
       setRefineNotice(`Refined based on: "${instruction}"`);
 
-      // Clear notice after 5 seconds
       setTimeout(() => setRefineNotice(null), 5000);
     } catch (err) {
       console.error('Refinement error:', err);
@@ -60,19 +60,54 @@ export default function ItineraryView({ itinerary, onUpdateItinerary, onReset })
 
   return (
     <div className="space-y-6 animate-fadeIn">
-      {/* Header Info Banner */}
+      {/* Low Budget Warning Banner */}
+      {itinerary.isBudgetTooLow && (
+        <div className="bg-amber-50 border border-amber-300 rounded-2xl p-5 text-amber-900 shadow-sm flex items-start gap-3 animate-fadeIn">
+          <div className="p-2 bg-amber-100 rounded-xl text-amber-700 shrink-0">
+            <AlertTriangle className="w-5 h-5" />
+          </div>
+          <div className="space-y-1">
+            <h3 className="font-bold text-sm text-amber-950 flex items-center gap-2">
+              ⚠️ Given Budget is Too Low
+            </h3>
+            <p className="text-xs sm:text-sm text-amber-800 leading-relaxed">
+              {itinerary.budgetWarning || `The requested budget is too low for a realistic trip to ${itinerary.destination}. Recommended minimum budget is $50/day per person.`}
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* Header Info Banner with Per-Pax Budget */}
       <div className="bg-gradient-to-br from-indigo-900 via-indigo-800 to-slate-900 text-white rounded-2xl p-6 sm:p-8 shadow-xl relative overflow-hidden">
         {/* Background glow effects */}
         <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl" />
         <div className="absolute bottom-0 left-0 w-48 h-48 bg-purple-500/10 rounded-full blur-2xl" />
 
-        <div className="relative z-10 space-y-3">
-          {itinerary.isMock && (
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-500/20 border border-amber-400/30 text-amber-300 rounded-full text-xs font-medium">
-              <AlertCircle className="w-3.5 h-3.5" />
-              <span>Offline / Demo Fallback Mode</span>
-            </div>
-          )}
+        <div className="relative z-10 space-y-4">
+          <div className="flex items-center justify-between flex-wrap gap-2">
+            {itinerary.isMock ? (
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-500/20 border border-amber-400/30 text-amber-300 rounded-full text-xs font-medium">
+                <AlertCircle className="w-3.5 h-3.5" />
+                <span>Offline / Demo Fallback Mode</span>
+              </div>
+            ) : (
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 rounded-full text-xs font-medium">
+                <Sparkles className="w-3.5 h-3.5" />
+                <span>Live AI Generated Plan</span>
+              </div>
+            )}
+
+            {/* Per-Pax Budget Badge */}
+            {itinerary.estimatedBudgetPerPax && (
+              <button
+                onClick={() => setShowBudgetDetails(!showBudgetDetails)}
+                className="inline-flex items-center gap-1.5 px-3.5 py-1 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-full text-xs font-bold shadow-md shadow-emerald-900/30 hover:brightness-110 transition-all cursor-pointer"
+              >
+                <DollarSign className="w-3.5 h-3.5" />
+                <span>Est. Budget: {itinerary.estimatedBudgetPerPax}</span>
+              </button>
+            )}
+          </div>
 
           {refineNotice && (
             <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 rounded-full text-xs font-medium animate-fadeIn">
@@ -110,10 +145,34 @@ export default function ItineraryView({ itinerary, onUpdateItinerary, onReset })
           <p className="text-sm text-indigo-100/80 pt-2 border-t border-indigo-700/50 leading-relaxed">
             {itinerary.summary}
           </p>
+
+          {/* Budget Breakdown Drawer */}
+          {showBudgetDetails && itinerary.budgetBreakdown && (
+            <div className="mt-4 p-4 bg-white/10 backdrop-blur-md rounded-xl border border-white/10 space-y-2 text-xs animate-fadeIn">
+              <div className="flex items-center gap-1.5 font-bold text-emerald-300">
+                <PieChart className="w-4 h-4" />
+                <span>Estimated Budget Breakdown (per pax)</span>
+              </div>
+              <div className="grid grid-cols-3 gap-2 text-center pt-1">
+                <div className="p-2 bg-white/5 rounded-lg">
+                  <span className="text-indigo-200 block text-[10px]">Stay & Hotel</span>
+                  <span className="font-bold text-sm text-white">{itinerary.budgetBreakdown.stay}</span>
+                </div>
+                <div className="p-2 bg-white/5 rounded-lg">
+                  <span className="text-indigo-200 block text-[10px]">Food & Dining</span>
+                  <span className="font-bold text-sm text-white">{itinerary.budgetBreakdown.food}</span>
+                </div>
+                <div className="p-2 bg-white/5 rounded-lg">
+                  <span className="text-indigo-200 block text-[10px]">Activities & Transport</span>
+                  <span className="font-bold text-sm text-white">{itinerary.budgetBreakdown.activities}</span>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
-      {/* AI Refinement Bar Component */}
+      {/* AI Refinement Bar Component with Budget Input */}
       <RefinementBar onRefine={handleRefine} isRefining={isRefining} />
 
       {/* Days Breakdown */}

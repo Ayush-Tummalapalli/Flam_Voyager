@@ -27,7 +27,6 @@ export async function POST(req) {
 
     const apiKey = process.env.GROQ_API_KEY || process.env.GEMINI_API_KEY;
 
-    // Fallback if API key is missing or default
     if (!apiKey || apiKey.includes('your_gemini_api_key') || apiKey.includes('your_groq_api_key')) {
       console.warn('API Key is missing. Returning modified fallback mock data.');
       const mockData = getMockItinerary(`${existingItinerary.destination || 'Trip'} (${userInstruction})`);
@@ -44,16 +43,25 @@ ${JSON.stringify(existingItinerary, null, 2)}
 USER REFINEMENT INSTRUCTION:
 "${userInstruction}"
 
-CRITICAL INSTRUCTIONS:
-1. Modify the existing itinerary according to the user's instruction (e.g., swapping activities, adding food options, adjusting pace/budget, changing specific days).
-2. Retain existing good stops unless the user explicitly requested replacing them.
-3. You MUST return ONLY a valid JSON object with NO markdown formatting, NO backticks, and NO extra commentary.
-4. Schema MUST match:
+CRITICAL BUDGET INSTRUCTIONS:
+1. If the user specifies a new budget target or range (e.g. "budget under $200 per pax" or "$50 per person"), update the itinerary activities, food choices, and stay estimates to match this target budget.
+2. If the user's requested budget is unrealistically low for this destination and trip length (e.g. $10 or $20 total for a multi-day trip), set "isBudgetTooLow": true and provide a clear "budgetWarning" string (e.g., "Given budget ($20/pax) is too low for a 3-day trip to Tokyo. Recommended minimum budget is $180 per person.").
+3. Re-calculate "estimatedBudgetPerPax" and "budgetBreakdown" (stay, food, activities).
+
+Schema MUST match:
 {
   "tripTitle": "Title",
   "destination": "City, Country",
   "duration": "X Days",
-  "summary": "Updated summary reflecting the changes made",
+  "summary": "Updated summary reflecting the budget or activity changes made",
+  "estimatedBudgetPerPax": "$XXX / person",
+  "budgetBreakdown": {
+    "stay": "$XXX",
+    "food": "$XXX",
+    "activities": "$XXX"
+  },
+  "isBudgetTooLow": false,
+  "budgetWarning": null,
   "days": [
     {
       "dayNumber": 1,
@@ -65,18 +73,21 @@ CRITICAL INSTRUCTIONS:
           "time": "Time",
           "description": "Description",
           "category": "Category",
-          "location": "Location"
+          "location": "Location",
+          "estimatedCost": "$15"
         }
       ]
     }
   ]
 }
+
+Return ONLY the raw JSON object string with no markdown backticks.
 `;
 
     let responseText = null;
 
     if (apiKey.startsWith('gsk_')) {
-      console.log('Refining via Groq API engine...');
+      console.log('Refining via Groq API engine with budget checks...');
       const groqRes = await fetch('https://api.groq.com/openai/v1/chat/completions', {
         method: 'POST',
         headers: {
@@ -117,7 +128,6 @@ CRITICAL INSTRUCTIONS:
       throw new Error('Received empty response from AI model during refinement.');
     }
 
-    // Clean JSON response
     let cleanedText = responseText.trim();
     if (cleanedText.startsWith('```json')) {
       cleanedText = cleanedText.replace(/^```json\s*/, '').replace(/\s*```$/, '');
@@ -136,7 +146,6 @@ CRITICAL INSTRUCTIONS:
 
   } catch (error) {
     console.error('Refinement API Error:', error.message);
-    // Return updated mock fallback if error occurs
     const mockData = getMockItinerary(userInstruction || 'Refined Trip');
     return Response.json({
       success: true,
