@@ -13,17 +13,19 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [lastPrompt, setLastPrompt] = useState('');
+  const [lastCompanion, setLastCompanion] = useState('Solo Traveler');
 
-  const generateItinerary = async (prompt) => {
+  const generateItinerary = async (prompt, companionType = 'Solo Traveler') => {
     setIsLoading(true);
     setError(null);
     setLastPrompt(prompt);
+    setLastCompanion(companionType);
 
     try {
       const response = await fetch('/api/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt }),
+        body: JSON.stringify({ prompt, companionType }),
       });
 
       let data;
@@ -50,13 +52,13 @@ export default function Home() {
 
   const handleRetry = () => {
     if (lastPrompt) {
-      generateItinerary(lastPrompt);
+      generateItinerary(lastPrompt, lastCompanion);
     }
   };
 
   const handleUseMock = () => {
     setError(null);
-    const mockData = getMockItinerary(lastPrompt || 'Sample Trip');
+    const mockData = getMockItinerary(lastPrompt || 'Sample Trip', null, lastCompanion);
     setItinerary(mockData);
   };
 
@@ -95,7 +97,7 @@ export default function Home() {
               Plan Your Next Adventure in Seconds
             </h2>
             <p className="text-slate-500 text-sm leading-relaxed">
-              Describe your destination, trip length, or vibe. FlamVoyager generates an interactive day-by-day itinerary you can reorder and customize.
+              Describe your destination, trip length, or vibe. FlamVoyager generates an interactive day-by-day itinerary tailored to your travel companions.
             </p>
           </div>
         )}

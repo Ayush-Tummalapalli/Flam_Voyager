@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import DayCard from './DayCard';
 import RefinementBar from './RefinementBar';
-import { MapPin, Calendar, RefreshCw, AlertCircle, Sparkles, DollarSign, AlertTriangle, PieChart, SunMedium, Thermometer, Briefcase } from 'lucide-react';
+import { MapPin, Calendar, RefreshCw, AlertCircle, Sparkles, DollarSign, AlertTriangle, PieChart, SunMedium, Thermometer, Briefcase, Users } from 'lucide-react';
 
 export default function ItineraryView({ itinerary, onUpdateItinerary, onReset }) {
   const [isRefining, setIsRefining] = useState(false);
@@ -84,17 +84,27 @@ export default function ItineraryView({ itinerary, onUpdateItinerary, onReset })
 
         <div className="relative z-10 space-y-4">
           <div className="flex items-center justify-between flex-wrap gap-2">
-            {itinerary.isMock ? (
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-500/20 border border-amber-400/30 text-amber-300 rounded-full text-xs font-medium">
-                <AlertCircle className="w-3.5 h-3.5" />
-                <span>Offline / Demo Fallback Mode</span>
-              </div>
-            ) : (
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 rounded-full text-xs font-medium">
-                <Sparkles className="w-3.5 h-3.5" />
-                <span>Live AI Generated Plan</span>
-              </div>
-            )}
+            <div className="flex items-center gap-2 flex-wrap">
+              {itinerary.isMock ? (
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-500/20 border border-amber-400/30 text-amber-300 rounded-full text-xs font-medium">
+                  <AlertCircle className="w-3.5 h-3.5" />
+                  <span>Offline / Demo Fallback Mode</span>
+                </div>
+              ) : (
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 rounded-full text-xs font-medium">
+                  <Sparkles className="w-3.5 h-3.5" />
+                  <span>Live AI Generated Plan</span>
+                </div>
+              )}
+
+              {/* Companion Type Badge */}
+              {itinerary.companionType && (
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-indigo-500/20 border border-indigo-400/30 text-indigo-200 rounded-full text-xs font-semibold">
+                  <Users className="w-3.5 h-3.5 text-indigo-400" />
+                  <span>{itinerary.companionType}</span>
+                </div>
+              )}
+            </div>
 
             {/* Per-Pax Total Budget Badge */}
             {itinerary.estimatedBudgetPerPax && (

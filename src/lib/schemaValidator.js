@@ -1,6 +1,6 @@
 /**
  * Schema Validator & Normalizer for Travel Planner Itineraries.
- * Includes Weather & Season Advisor, Per-Pax Budget Estimation, and Budget Warning handling.
+ * Includes Companion Type, Weather & Season Advisor, Per-Pax Budget Estimation, and Budget Warning handling.
  */
 
 export function validateAndCleanItinerary(data) {
@@ -16,6 +16,9 @@ export function validateAndCleanItinerary(data) {
     destination: typeof data.destination === 'string' ? data.destination : 'Destination',
     duration: typeof data.duration === 'string' ? data.duration : 'Multi-day Trip',
     summary: typeof data.summary === 'string' ? data.summary : 'An itinerary tailored to your preferences.',
+    companionType: typeof data.companionType === 'string' && data.companionType.trim() !== ''
+      ? data.companionType
+      : 'General',
     estimatedBudgetPerPax: typeof data.estimatedBudgetPerPax === 'string' && data.estimatedBudgetPerPax.trim() !== ''
       ? data.estimatedBudgetPerPax
       : '$350 / person',

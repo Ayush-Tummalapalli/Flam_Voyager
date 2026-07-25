@@ -29,7 +29,11 @@ export async function POST(req) {
 
     if (!apiKey || apiKey.includes('your_gemini_api_key') || apiKey.includes('your_groq_api_key')) {
       console.warn('API Key is missing. Returning modified fallback mock data.');
-      const mockData = getMockItinerary(`${existingItinerary.destination || 'Trip'} (${userInstruction})`);
+      const mockData = getMockItinerary(
+        `${existingItinerary.destination || 'Trip'} (${userInstruction})`,
+        null,
+        existingItinerary.companionType || 'Solo Traveler'
+      );
       return Response.json({ success: true, data: mockData });
     }
 
@@ -44,12 +48,9 @@ USER REFINEMENT INSTRUCTION:
 "${userInstruction}"
 
 CRITICAL INSTRUCTIONS:
-1. Update the itinerary based on the user's refinement instruction.
-2. Preserve or update "weatherAdvisor" object with:
-   - "bestSeason": string
-   - "averageTemp": string
-   - "packingTip": string
-3. Preserve or update "estimatedBudgetPerPax" and "budgetBreakdown".
+1. Update the itinerary based on the refinement instruction.
+2. If user requests changing companion vibe (e.g. to Family, Couple, Friends, Solo), update "companionType" and tailor activities accordingly.
+3. Preserve or update "weatherAdvisor", "estimatedBudgetPerPax", and "budgetBreakdown".
 
 Schema MUST match:
 {
@@ -57,6 +58,7 @@ Schema MUST match:
   "destination": "City, Country",
   "duration": "X Days",
   "summary": "Updated summary",
+  "companionType": "Companion type",
   "estimatedBudgetPerPax": "$XXX / person",
   "budgetBreakdown": {
     "stay": "$XXX",
@@ -95,7 +97,7 @@ Return ONLY raw JSON.
     let responseText = null;
 
     if (apiKey.startsWith('gsk_')) {
-      console.log('Refining via Groq API engine with weather & budget features...');
+      console.log('Refining via Groq API engine with companion support...');
       const groqRes = await fetch('https://api.groq.com/openai/v1/chat/completions', {
         method: 'POST',
         headers: {
@@ -154,7 +156,11 @@ Return ONLY raw JSON.
 
   } catch (error) {
     console.error('Refinement API Error:', error.message);
-    const mockData = getMockItinerary(userInstruction || 'Refined Trip');
+    const mockData = getMockItinerary(
+      userInstruction || 'Refined Trip',
+      null,
+      existingItinerary?.companionType || 'Solo Traveler'
+    );
     return Response.json({
       success: true,
       data: mockData,

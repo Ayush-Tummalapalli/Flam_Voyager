@@ -1,8 +1,8 @@
 /**
- * Dynamic Smart Itinerary Generator with Per-Pax Budget Estimation & Weather Advisor.
+ * Dynamic Smart Itinerary Generator with Companion Filters, Per-Pax Budget & Weather Advisor.
  */
 
-export function getMockItinerary(userPrompt, targetBudget = null) {
+export function getMockItinerary(userPrompt, targetBudget = null, companionType = 'Solo Traveler') {
   const prompt = userPrompt || 'Travel trip';
   const promptLower = prompt.toLowerCase();
   
@@ -56,16 +56,9 @@ export function getMockItinerary(userPrompt, targetBudget = null) {
       averageTemp: '29°C / 84°F',
       packingTip: 'Beachwear, sunglasses, mosquito repellent & light cottons.'
     };
-  } else if (promptLower.includes('york') || promptLower.includes('nyc')) {
-    destination = 'New York City, USA';
-    weatherAdvisor = {
-      bestSeason: 'September to November & April to June',
-      averageTemp: '17°C / 62°F',
-      packingTip: 'Durable walking shoes, layered clothing & compact daypack.'
-    };
   }
 
-  // Extract duration (default 3 days)
+  // Extract duration
   let daysCount = 3;
   const dayMatch = promptLower.match(/(\d+)\s*day/);
   if (dayMatch && dayMatch[1]) {
@@ -95,49 +88,68 @@ export function getMockItinerary(userPrompt, targetBudget = null) {
 
   const days = [];
   for (let i = 1; i <= daysCount; i++) {
+    let stop1Title = `Arrival & Exploring Sights in ${destination}`;
+    let stop2Title = 'Local Cuisine & Food Tasting';
+    let stop3Title = 'Sunset Viewpoint & Evening Walk';
+
+    if (companionType.includes('Family')) {
+      stop1Title = `Family Friendly Parks & Sights in ${destination}`;
+      stop2Title = 'Kid-Friendly Local Restaurant';
+      stop3Title = 'Interactive Science & Nature Park Walk';
+    } else if (companionType.includes('Couple')) {
+      stop1Title = `Romantic Old Town Stroll in ${destination}`;
+      stop2Title = 'Candlelit Local Bistro & Wine Tasting';
+      stop3Title = 'Scenic Sunset Panorama Viewpoint';
+    } else if (companionType.includes('Friends')) {
+      stop1Title = `Group Adventure & High Energy Sights in ${destination}`;
+      stop2Title = 'Vibrant Street Food & Craft Brewery Crawl';
+      stop3Title = 'Night Market & Live Music Lounge';
+    }
+
     const dayStops = [
       {
         id: `stop-${i}-1`,
-        title: i === 1 ? `Arrival & Historic Sights in ${destination}` : i === 2 ? 'Cultural Landmarks & Architecture' : 'Local Markets & Panoramics',
+        title: stop1Title,
         time: '10:00 AM - 01:00 PM',
-        description: `Explore the vibrant streets, historic landmarks, and scenery of ${destination}.`,
+        description: `Experience ${destination} tailored specifically for ${companionType}.`,
         category: 'Sightseeing',
         location: destination,
         estimatedCost: '$15 - $25'
       },
       {
         id: `stop-${i}-2`,
-        title: reqBudget && reqBudget < 400 ? 'Budget Street Food & Local Eateries' : 'Authentic Regional Dining',
+        title: stop2Title,
         time: '01:30 PM - 03:00 PM',
-        description: `Sample regional culinary specialties and local delicacies.`,
+        description: `Sample regional food and dining spots suitable for ${companionType}.`,
         category: 'Food',
-        location: `${destination} Central Market`,
+        location: `${destination} Central District`,
         estimatedCost: reqBudget && reqBudget < 400 ? '$8 - $15' : '$25 - $40'
       },
       {
         id: `stop-${i}-3`,
-        title: 'Sunset Viewpoint & Evening Stroll',
+        title: stop3Title,
         time: '06:00 PM - 08:30 PM',
-        description: `Relax and take in panoramic views of ${destination}.`,
+        description: `Relax and wrap up day ${i} with an enjoyable evening atmosphere.`,
         category: 'Relaxation',
-        location: `${destination} Waterfront`,
+        location: `${destination} Promenade`,
         estimatedCost: 'Free'
       }
     ];
 
     days.push({
       dayNumber: i,
-      title: `Day ${i}: ${i === 1 ? 'Arrival & Key Sights' : i === 2 ? 'Culture & Food' : 'Excursions'}`,
+      title: `Day ${i}: ${i === 1 ? 'Arrival & Key Highlights' : i === 2 ? 'Culture & Dining' : 'Excursions'}`,
       stops: dayStops
     });
   }
 
   return {
     isMock: true,
-    tripTitle: `${daysCount}-Day ${destination} Experience`,
+    tripTitle: `${daysCount}-Day ${destination} (${companionType} Edition)`,
     destination: destination,
     duration: `${daysCount} Days`,
-    summary: `A customized ${daysCount}-day itinerary for "${prompt}".`,
+    summary: `A customized ${daysCount}-day itinerary for ${companionType} based on "${prompt}".`,
+    companionType: companionType,
     estimatedBudgetPerPax: `$${estimatedTotalPerPax} / person`,
     budgetBreakdown: {
       stay: `$${Math.round(estimatedTotalPerPax * 0.45)}`,

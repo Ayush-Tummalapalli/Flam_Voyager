@@ -4,10 +4,12 @@ import { getMockItinerary } from '@/lib/mockItinerary';
 
 export async function POST(req) {
   let userPrompt = '';
+  let companionType = 'Solo Traveler';
 
   try {
     const body = await req.json();
     userPrompt = body.prompt || '';
+    companionType = body.companionType || 'Solo Traveler';
 
     if (!userPrompt || typeof userPrompt !== 'string' || userPrompt.trim() === '') {
       return Response.json(
@@ -20,7 +22,7 @@ export async function POST(req) {
 
     if (!apiKey || apiKey.includes('your_gemini_api_key') || apiKey.includes('your_groq_api_key')) {
       console.warn('API Key is missing or default. Returning fallback mock data.');
-      const mockData = getMockItinerary(userPrompt);
+      const mockData = getMockItinerary(userPrompt, null, companionType);
       return Response.json({ success: true, data: mockData });
     }
 
@@ -28,20 +30,23 @@ export async function POST(req) {
 You are an expert travel planner assistant.
 Generate a realistic, day-by-day travel itinerary based on the user request.
 
+TRAVEL COMPANION FILTER:
+The user is traveling as: "${companionType}".
+Tailor all activities, pace, meal choices, and recommendations specifically for a "${companionType}" experience (e.g. kid-friendly activities for Families, romantic candlelit dinners for Couples, social hostels/walks for Solo travelers, or group adventures/nightlife for Friends).
+
 REQUIRED SCHEMAS & FEATURES:
-1. Estimate total budget per person in USD (estimatedBudgetPerPax, budgetBreakdown: stay, food, activities).
-2. If user requests an unrealistically low budget (under $30/day), set isBudgetTooLow: true and budgetWarning string.
-3. Provide a "weatherAdvisor" object with:
-   - "bestSeason": string (e.g., "Nov to April (Dry & sunny)")
-   - "averageTemp": string (e.g., "28°C / 82°F")
-   - "packingTip": string (e.g., "Sunscreen, linen shirts, sunglasses & comfortable walking shoes")
+1. Include "companionType": "${companionType}".
+2. Estimate total budget per person in USD (estimatedBudgetPerPax, budgetBreakdown: stay, food, activities).
+3. If user requests an unrealistically low budget (under $30/day), set isBudgetTooLow: true and budgetWarning string.
+4. Provide a "weatherAdvisor" object (bestSeason, averageTemp, packingTip).
 
 Required JSON Schema:
 {
   "tripTitle": "Catchy title for the trip",
   "destination": "City, Country",
   "duration": "X Days",
-  "summary": "Short 2-sentence summary",
+  "summary": "Short 2-sentence summary tailored to ${companionType}",
+  "companionType": "${companionType}",
   "estimatedBudgetPerPax": "$XXX / person",
   "budgetBreakdown": {
     "stay": "$XXX",
@@ -49,9 +54,9 @@ Required JSON Schema:
     "activities": "$XXX"
   },
   "weatherAdvisor": {
-    "bestSeason": "Best months / season to visit",
-    "averageTemp": "Average temperature",
-    "packingTip": "Key packing items"
+    "bestSeason": "Best season",
+    "averageTemp": "Avg temp",
+    "packingTip": "Packing tip"
   },
   "isBudgetTooLow": false,
   "budgetWarning": null,
@@ -66,7 +71,7 @@ Required JSON Schema:
           "time": "09:00 AM - 11:30 AM",
           "description": "2-3 sentences explaining what to do here",
           "category": "Sightseeing | Food | Culture | Relaxation | Shopping | Adventure",
-          "location": "Specific location or landmark name (e.g., Colosseum, Rome)",
+          "location": "Landmark / Area",
           "estimatedCost": "$15 - $25"
         }
       ]
@@ -74,13 +79,13 @@ Required JSON Schema:
   ]
 }
 
-DO NOT include markdown or backticks. Return ONLY the raw JSON string.
+Return ONLY raw JSON.
 `;
 
     let responseText = null;
 
     if (apiKey.startsWith('gsk_')) {
-      console.log('Calling Groq API with Weather & Budget features...');
+      console.log(`Calling Groq API for generation (${companionType})...`);
       const groqRes = await fetch('https://api.groq.com/openai/v1/chat/completions', {
         method: 'POST',
         headers: {
@@ -106,7 +111,7 @@ DO NOT include markdown or backticks. Return ONLY the raw JSON string.
       responseText = groqData.choices?.[0]?.message?.content;
 
     } else {
-      console.log('Calling Google Gemini API...');
+      console.log(`Calling Google Gemini API (${companionType})...`);
       const genAI = new GoogleGenerativeAI(apiKey);
       const model = genAI.getGenerativeModel({
         model: 'gemini-1.5-flash',
@@ -140,7 +145,7 @@ DO NOT include markdown or backticks. Return ONLY the raw JSON string.
 
   } catch (error) {
     console.error('API Generation Error:', error.message);
-    const mockData = getMockItinerary(userPrompt || 'Custom Trip');
+    const mockData = getMockItinerary(userPrompt || 'Custom Trip', null, companionType);
     return Response.json({
       success: true,
       data: mockData,
