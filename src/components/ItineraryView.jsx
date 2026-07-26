@@ -5,16 +5,27 @@ import DayCard from './DayCard';
 import RefinementBar from './RefinementBar';
 import PackingChecklist from './PackingChecklist';
 import { CURRENCIES, convertCurrencyString } from '@/lib/currencyConverter';
-import { MapPin, Calendar, RefreshCw, AlertCircle, Sparkles, DollarSign, AlertTriangle, PieChart, SunMedium, Thermometer, Briefcase, Users, Printer, Share2, Check, Globe } from 'lucide-react';
+import { saveTrip } from '@/lib/tripStorage';
+import { MapPin, Calendar, RefreshCw, AlertCircle, Sparkles, DollarSign, AlertTriangle, PieChart, SunMedium, Thermometer, Briefcase, Users, Printer, Share2, Check, Globe, BookmarkPlus, BookmarkCheck } from 'lucide-react';
 
-export default function ItineraryView({ itinerary, onUpdateItinerary, onReset, darkMode }) {
+export default function ItineraryView({ itinerary, onUpdateItinerary, onReset, darkMode, onTripSaved }) {
   const [isRefining, setIsRefining] = useState(false);
   const [refineNotice, setRefineNotice] = useState(null);
   const [copiedShare, setCopiedShare] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
   const [currency, setCurrency] = useState('USD');
   const [activeTab, setActiveTab] = useState('itinerary'); // 'itinerary' | 'packing'
 
   if (!itinerary) return null;
+
+  const handleSaveCurrentTrip = () => {
+    const savedId = saveTrip(itinerary);
+    if (savedId) {
+      setIsSaved(true);
+      if (onTripSaved) onTripSaved();
+      setTimeout(() => setIsSaved(false), 4000);
+    }
+  };
 
   const handleUpdateStops = (dayNumber, newStops) => {
     const updatedDays = itinerary.days.map((day) => {
@@ -198,6 +209,13 @@ export default function ItineraryView({ itinerary, onUpdateItinerary, onReset, d
             </div>
           )}
 
+          {isSaved && (
+            <div className="inline-flex items-center gap-1.5 px-3.5 py-1 bg-indigo-500/30 border border-indigo-400/40 text-indigo-200 rounded-full text-xs font-semibold animate-fadeIn">
+              <BookmarkCheck className="w-3.5 h-3.5 text-indigo-300" />
+              <span>Saved to My Trips drawer!</span>
+            </div>
+          )}
+
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
               <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
@@ -215,8 +233,17 @@ export default function ItineraryView({ itinerary, onUpdateItinerary, onReset, d
               </div>
             </div>
 
-            {/* Action Bar: Export PDF, Share Trip, New Plan */}
+            {/* Action Bar: Save Trip, Export PDF, Share Trip, New Plan */}
             <div className="flex items-center gap-2 flex-wrap self-start sm:self-center no-print">
+              <button
+                onClick={handleSaveCurrentTrip}
+                title="Save itinerary to browser localStorage"
+                className="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold rounded-xl border border-indigo-400/30 flex items-center gap-1.5 transition-all shadow-sm"
+              >
+                {isSaved ? <BookmarkCheck className="w-3.5 h-3.5 text-indigo-200" /> : <BookmarkPlus className="w-3.5 h-3.5" />}
+                <span>{isSaved ? 'Saved!' : 'Save Trip'}</span>
+              </button>
+
               <button
                 onClick={handleShareTrip}
                 title="Copy trip text summary for WhatsApp or messages"

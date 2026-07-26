@@ -1,101 +1,74 @@
-# ✈️ FlamVoyager - AI Travel Planner
+# 🚀 FlamVoyager — AI Travel Planner
 
-An interactive, AI-powered travel itinerary planning application built with **React** and **JavaScript** (no TypeScript) for the **Flam Frontend Internship Assignment**. It converts free-form travel requests into clean, structured, and interactive day-by-day itineraries.
-
----
-
-## 🌟 Key Features & Highlights
-
-1. **Free-Form Text Input**: Users can enter any travel request (e.g., *"3 days in Tokyo on a budget focusing on food & tech"*).
-2. **Server-Side API Security**: Uses a Next.js API route proxy (`/api/generate`) so the LLM API key is **never exposed in the browser code**.
-3. **Strict Structured JSON Schema**: Enforces JSON response mode and validates all generated fields using `schemaValidator.js`.
-4. **Resilient Failure Handling**:
-   - Handles malformed JSON, schema mismatches, and API errors gracefully without UI crashes.
-   - Provides a **Smart Fallback Engine** (`mockItinerary.js`) when offline or when API limits are hit, ensuring the app remains 100% testable.
-5. **Interactive Itinerary Controls**:
-   - **Expand/Collapse**: Inspect full activity descriptions, location tags, and categories.
-   - **Reorder Stops**: Move activities up/down within any day.
-   - **Delete Stops**: Remove unwanted stops dynamically.
-   - **Add Custom Stop**: Manually append custom activities to any day.
+> **Frontend Internship Assignment Submission for Flam**  
+> *Built with Next.js (App Router, JavaScript), Tailwind CSS, Lucide Icons, and Dual AI Engine (Groq Llama 3.3 70B & Google Gemini 1.5 Flash).*
 
 ---
 
-## 🛠️ Project Setup & Installation
+## 🌟 Live Demo & Architecture
 
-### Prerequisites
-- Node.js (v18 or higher)
-- npm or yarn
-
-### Steps to Run Locally
-
-1. **Clone & Install Dependencies**:
-   ```bash
-   git clone https://github.com/Ayush-Tummalapalli/Flam_Voyager.git
-   cd Flam_Voyager
-   npm install
-   ```
-
-2. **Configure Environment Variable**:
-   Create a `.env.local` file in the root directory:
-   ```env
-   GROQ_API_KEY=gsk_your_groq_api_key_here
-   # OR
-   GEMINI_API_KEY=your_gemini_api_key_here
-   ```
-   *(Note: If no API key is set, the app seamlessly uses the built-in Smart Fallback engine).*
-
-3. **Start Development Server**:
-   ```bash
-   npm run dev
-   ```
-   Open [http://localhost:3000](http://localhost:3000) in your browser.
-
-4. **Production Build & Start**:
-   ```bash
-   npm run build
-   npm start
-   ```
+- **Live Local App**: `http://localhost:3000`
+- **GitHub Repository**: [https://github.com/Ayush-Tummalapalli/Flam_Voyager.git](https://github.com/Ayush-Tummalapalli/Flam_Voyager.git)
 
 ---
 
-## 📁 Architecture Overview
+## 🎯 Key Features Built
 
-```
-Flam_Voyager/
-├── src/
-│   ├── app/
-│   │   ├── api/
-│   │   │   └── generate/
-│   │   │       └── route.js        # Server-side API proxy (keeps API key secure)
-│   │   ├── layout.js               # Root app layout & metadata
-│   │   ├── page.js                 # Main stateful home page
-│   │   └── globals.css             # Tailwind CSS & animations
-│   ├── lib/
-│   │   ├── schemaValidator.js      # Validates & repairs AI output structure
-│   │   └── mockItinerary.js        # Fallback offline generator
-│   └── components/
-│       ├── TripInputForm.jsx       # Free-form prompt text area & presets
-│       ├── ItineraryView.jsx       # Full itinerary renderer
-│       ├── DayCard.jsx             # Day container with stop management
-│       ├── StopItem.jsx            # Interactive stop item (reorder, expand, delete)
-│       ├── ErrorAlert.jsx          # Error handling & retry UI
-│       └── LoadingSkeleton.jsx     # Loading visual feedback
-├── .env.example
-├── .gitignore
-├── package.json
-└── README.md
+1. **Structured AI Travel Engine**:
+   - Accepts free-form trip prompts (destination, days, budget, vibe).
+   - Returns strict JSON schema rendered into interactive, drag/reorder/delete/add React components.
+2. **Robust Failure Handling & Zero-Crash Architecture**:
+   - `schemaValidator.js` validates, sanitizes, and repairs malformed AI outputs.
+   - Dynamic `mockItinerary.js` Fallback Engine seamlessly takes over during offline states, rate limits, or API key errors.
+3. **👥 Travel Companion Personalization**:
+   - Filter options: `🧳 Solo Traveler`, `👩‍❤️‍👨 Couple / Romantic`, `👨‍👩‍👧‍👦 Family with Kids`, `🥳 Group of Friends`.
+4. **💰 Per-Pax Budget Breakdown & Low-Budget Detection**:
+   - Estimates total cost per person and breaks down into Stay, Food, and Activities.
+   - Triggers warning banner if requested budget is unrealistically low.
+5. **💱 Multi-Currency Converter**:
+   - Real-time instant toggle between **USD ($)**, **INR (₹)**, **EUR (€)**, **GBP (£)**, and **AED**.
+6. **🎒 Interactive AI Packing Checklist**:
+   - Destination & weather tailored checklist with interactive check-off and custom item adder.
+7. **🗺️ Interactive Google Maps & Weather Advisor**:
+   - Location tags link directly to Google Maps search tabs.
+8. **📄 Export PDF & WhatsApp/SMS Share**:
+   - One-click clean PDF export (`@media print`) and copy-formatted text summary for messaging.
+9. **💾 Save and Reload Sessions (My Saved Trips Drawer)**:
+   - Save itineraries to browser `localStorage` and reload past sessions with 1 click.
+10. **🌙 Dark Mode / Light Mode**:
+    - Obsidian dark theme toggle with persistent `localStorage` theme preference.
+
+---
+
+## 🛠️ Local Setup Instructions
+
+```bash
+# 1. Clone the repository
+git clone https://github.com/Ayush-Tummalapalli/Flam_Voyager.git
+cd Flam_Voyager
+
+# 2. Install dependencies
+npm install
+
+# 3. Create .env.local with your Groq or Gemini API Key
+echo "GROQ_API_KEY=your_groq_api_key_here" > .env.local
+
+# 4. Start development server
+npm run dev
 ```
 
----
-
-## 🤖 AI Usage Note (Transparency)
-- **AI Tools Used**: Google Antigravity for pair programming, structural design, and component scaffolding.
-- **Custom Logic & Oversight**: All state management, schema validation, fallback mechanisms, drag-free reordering logic, and responsive UI layouts were manually curated and verified to ensure full understanding for interview walkthroughs.
+Open `http://localhost:3000` in your browser.
 
 ---
 
-## ⏱️ Time Spent & Limitations
-- **Total Time Spent**: ~2.5 hours.
-- **Known Limitations**:
-  - Drag-and-drop reordering uses explicit up/down buttons for maximum mobile compatibility and zero third-party library overhead.
-  - Multi-city complex routing could be enhanced further in future iterations.
+## 🔒 Security Note: Server-side API Proxy
+
+All LLM calls are routed through serverless API proxy routes (`/api/generate` & `/api/refine`).  
+**API keys are strictly stored on the server environment and never exposed to client browsers.**
+
+---
+
+## 📝 Note on AI Usage & Time Spent
+
+- **AI Tools Used**: Antigravity AI pair programming assistant for rapid UI iteration, schema validation design, and component modularity.
+- **Estimated Time Spent**: ~5.5 hours total (Core architecture: ~2.5h, Refinement & Budget engine: ~1.5h, Personalization & Features: ~1.5h).

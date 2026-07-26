@@ -5,8 +5,10 @@ import TripInputForm from '@/components/TripInputForm';
 import ItineraryView from '@/components/ItineraryView';
 import ErrorAlert from '@/components/ErrorAlert';
 import LoadingSkeleton from '@/components/LoadingSkeleton';
+import SavedTripsDrawer from '@/components/SavedTripsDrawer';
 import { getMockItinerary } from '@/lib/mockItinerary';
-import { Compass, ShieldCheck, Sun, Moon } from 'lucide-react';
+import { getSavedTrips, deleteSavedTrip } from '@/lib/tripStorage';
+import { Compass, ShieldCheck, Sun, Moon, BookmarkCheck } from 'lucide-react';
 
 export default function Home() {
   const [itinerary, setItinerary] = useState(null);
@@ -15,6 +17,8 @@ export default function Home() {
   const [lastPrompt, setLastPrompt] = useState('');
   const [lastCompanion, setLastCompanion] = useState('Solo Traveler');
   const [darkMode, setDarkMode] = useState(false);
+  const [savedTrips, setSavedTrips] = useState([]);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   useEffect(() => {
     // Load theme preference from localStorage
@@ -22,7 +26,22 @@ export default function Home() {
     if (savedTheme === 'dark') {
       setDarkMode(true);
     }
+    // Load saved trips from localStorage
+    setSavedTrips(getSavedTrips());
   }, []);
+
+  const refreshSavedTrips = () => {
+    setSavedTrips(getSavedTrips());
+  };
+
+  const handleDeleteSavedTrip = (savedId) => {
+    const updated = deleteSavedTrip(savedId);
+    setSavedTrips(updated);
+  };
+
+  const handleLoadSavedTrip = (savedItinerary) => {
+    setItinerary(savedItinerary);
+  };
 
   const toggleDarkMode = () => {
     const newMode = !darkMode;
@@ -82,7 +101,7 @@ export default function Home() {
       darkMode ? 'bg-slate-950 text-slate-100' : 'bg-slate-50 text-slate-800'
     }`}>
       {/* Top Header Navbar */}
-      <header className={`backdrop-blur-md border-b sticky top-0 z-50 transition-colors duration-300 ${
+      <header className={`backdrop-blur-md border-b sticky top-0 z-40 transition-colors duration-300 ${
         darkMode ? 'bg-slate-900/80 border-slate-800' : 'bg-white/80 border-slate-200/80'
       }`}>
         <div className="max-w-4xl mx-auto px-4 py-3.5 flex items-center justify-between">
@@ -100,7 +119,25 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
+            {/* My Saved Trips Drawer Button */}
+            <button
+              onClick={() => setIsDrawerOpen(true)}
+              className={`p-2 sm:px-3 sm:py-2 rounded-xl border text-xs font-semibold flex items-center gap-1.5 transition-all ${
+                darkMode
+                  ? 'bg-slate-800 border-slate-700 text-indigo-300 hover:bg-slate-700'
+                  : 'bg-indigo-50 border-indigo-200 text-indigo-700 hover:bg-indigo-100'
+              }`}
+            >
+              <BookmarkCheck className="w-4 h-4 text-indigo-500" />
+              <span className="hidden sm:inline">My Saved Trips</span>
+              {savedTrips.length > 0 && (
+                <span className="w-4 h-4 rounded-full bg-indigo-600 text-white text-[10px] font-bold flex items-center justify-center">
+                  {savedTrips.length}
+                </span>
+              )}
+            </button>
+
             {/* Theme Toggle Button */}
             <button
               onClick={toggleDarkMode}
@@ -115,17 +152,27 @@ export default function Home() {
               <span className="hidden sm:inline">{darkMode ? 'Light' : 'Dark'}</span>
             </button>
 
-            <div className={`flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full border ${
+            <div className={`hidden md:flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full border ${
               darkMode 
                 ? 'bg-emerald-950/60 text-emerald-300 border-emerald-800' 
                 : 'bg-emerald-50 text-emerald-700 border-emerald-200'
             }`}>
               <ShieldCheck className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Key Secured Server-side</span>
+              <span>Key Secured Server-side</span>
             </div>
           </div>
         </div>
       </header>
+
+      {/* Saved Trips Side Drawer */}
+      <SavedTripsDrawer
+        isOpen={isDrawerOpen}
+        onClose={() => setIsDrawerOpen(false)}
+        savedTrips={savedTrips}
+        onLoadTrip={handleLoadSavedTrip}
+        onDeleteTrip={handleDeleteSavedTrip}
+        darkMode={darkMode}
+      />
 
       {/* Main Container */}
       <div className="max-w-4xl mx-auto px-4 pt-8 space-y-6">
@@ -163,6 +210,7 @@ export default function Home() {
             darkMode={darkMode}
             onUpdateItinerary={setItinerary}
             onReset={() => setItinerary(null)}
+            onTripSaved={refreshSavedTrips}
           />
         )}
       </div>
