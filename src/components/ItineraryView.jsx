@@ -4,9 +4,10 @@ import { useState } from 'react';
 import DayCard from './DayCard';
 import RefinementBar from './RefinementBar';
 import PackingChecklist from './PackingChecklist';
+import BudgetChart from './BudgetChart';
 import { CURRENCIES, convertCurrencyString } from '@/lib/currencyConverter';
 import { saveTrip } from '@/lib/tripStorage';
-import { MapPin, Calendar, RefreshCw, AlertCircle, Sparkles, DollarSign, AlertTriangle, PieChart, SunMedium, Thermometer, Briefcase, Users, Printer, Share2, Check, Globe, BookmarkPlus, BookmarkCheck } from 'lucide-react';
+import { MapPin, Calendar, RefreshCw, AlertCircle, Sparkles, DollarSign, AlertTriangle, SunMedium, Thermometer, Briefcase, Users, Printer, Share2, Check, Globe, BookmarkPlus, BookmarkCheck } from 'lucide-react';
 
 export default function ItineraryView({ itinerary, onUpdateItinerary, onReset, darkMode, onTripSaved }) {
   const [isRefining, setIsRefining] = useState(false);
@@ -107,10 +108,6 @@ export default function ItineraryView({ itinerary, onUpdateItinerary, onReset, d
   const formattedTotalBudget = itinerary.estimatedBudgetPerPax 
     ? convertCurrencyString(itinerary.estimatedBudgetPerPax, currency) 
     : '$350 / person';
-
-  const formattedStay = itinerary.budgetBreakdown?.stay ? convertCurrencyString(itinerary.budgetBreakdown.stay, currency) : '$150';
-  const formattedFood = itinerary.budgetBreakdown?.food ? convertCurrencyString(itinerary.budgetBreakdown.food, currency) : '$120';
-  const formattedActivities = itinerary.budgetBreakdown?.activities ? convertCurrencyString(itinerary.budgetBreakdown.activities, currency) : '$80';
 
   return (
     <div className="space-y-6 animate-fadeIn">
@@ -277,34 +274,13 @@ export default function ItineraryView({ itinerary, onUpdateItinerary, onReset, d
             {itinerary.summary}
           </p>
 
-          {/* Always Visible Detailed Budget Breakdown Box */}
+          {/* Interactive SVG Budget Chart Block */}
           {itinerary.budgetBreakdown && (
-            <div className="mt-4 p-4 bg-white/10 backdrop-blur-md rounded-xl border border-white/15 space-y-2.5 text-xs">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-1.5 font-bold text-emerald-300">
-                  <PieChart className="w-4 h-4 text-emerald-400" />
-                  <span>Estimated Budget Breakdown (per pax in {currency})</span>
-                </div>
-                <span className="text-[10px] text-indigo-200 uppercase tracking-wider font-semibold">
-                  End-to-End Estimate
-                </span>
-              </div>
-              
-              <div className="grid grid-cols-3 gap-2.5 text-center pt-1">
-                <div className="p-2.5 bg-white/5 rounded-xl border border-white/5">
-                  <span className="text-indigo-200 block text-[10px] font-medium">Stay & Hotel</span>
-                  <span className="font-extrabold text-base text-white">{formattedStay}</span>
-                </div>
-                <div className="p-2.5 bg-white/5 rounded-xl border border-white/5">
-                  <span className="text-indigo-200 block text-[10px] font-medium">Food & Dining</span>
-                  <span className="font-extrabold text-base text-white">{formattedFood}</span>
-                </div>
-                <div className="p-2.5 bg-white/5 rounded-xl border border-white/5">
-                  <span className="text-indigo-200 block text-[10px] font-medium">Activities & Transport</span>
-                  <span className="font-extrabold text-base text-white">{formattedActivities}</span>
-                </div>
-              </div>
-            </div>
+            <BudgetChart 
+              budgetBreakdown={itinerary.budgetBreakdown} 
+              currency={currency} 
+              darkMode={darkMode} 
+            />
           )}
 
           {/* Weather & Season Advisor Card */}
