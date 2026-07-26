@@ -110,10 +110,10 @@ export default function ItineraryView({ itinerary, onUpdateItinerary, onReset, d
     : '$350 / person';
 
   return (
-    <div className="space-y-6 animate-fadeIn">
+    <div className="space-y-5 sm:space-y-6 animate-fadeIn">
       {/* Low Budget Warning Banner */}
       {itinerary.isBudgetTooLow && (
-        <div className={`border rounded-2xl p-5 shadow-sm flex items-start gap-3 animate-fadeIn no-print ${
+        <div className={`border rounded-2xl p-4 sm:p-5 shadow-sm flex items-start gap-3 animate-fadeIn no-print ${
           darkMode
             ? 'bg-amber-950/60 border-amber-800 text-amber-200'
             : 'bg-amber-50 border-amber-300 text-amber-900'
@@ -122,7 +122,7 @@ export default function ItineraryView({ itinerary, onUpdateItinerary, onReset, d
             <AlertTriangle className="w-5 h-5" />
           </div>
           <div className="space-y-1">
-            <h3 className="font-bold text-sm flex items-center gap-2">
+            <h3 className="font-bold text-xs sm:text-sm flex items-center gap-2">
               ⚠️ Given Budget is Too Low
             </h3>
             <p className="text-xs sm:text-sm leading-relaxed opacity-90">
@@ -133,7 +133,7 @@ export default function ItineraryView({ itinerary, onUpdateItinerary, onReset, d
       )}
 
       {/* Header Info Banner */}
-      <div className={`rounded-2xl p-6 sm:p-8 shadow-xl relative overflow-hidden space-y-5 ${
+      <div className={`rounded-2xl p-5 sm:p-8 shadow-xl relative overflow-hidden space-y-4 sm:space-y-5 ${
         darkMode
           ? 'bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 text-white border border-slate-800'
           : 'bg-gradient-to-br from-indigo-900 via-indigo-800 to-slate-900 text-white'
@@ -144,14 +144,14 @@ export default function ItineraryView({ itinerary, onUpdateItinerary, onReset, d
 
         <div className="relative z-10 space-y-4">
           <div className="flex items-center justify-between flex-wrap gap-2">
-            <div className="flex items-center gap-2 flex-wrap">
+            <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
               {itinerary.isMock ? (
-                <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-500/20 border border-amber-400/30 text-amber-300 rounded-full text-xs font-medium">
+                <div className="inline-flex items-center gap-1 px-2.5 py-0.5 sm:px-3 sm:py-1 bg-amber-500/20 border border-amber-400/30 text-amber-300 rounded-full text-[11px] sm:text-xs font-medium">
                   <AlertCircle className="w-3.5 h-3.5" />
                   <span>Offline / Demo Fallback Mode</span>
                 </div>
               ) : (
-                <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 rounded-full text-xs font-medium">
+                <div className="inline-flex items-center gap-1 px-2.5 py-0.5 sm:px-3 sm:py-1 bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 rounded-full text-[11px] sm:text-xs font-medium">
                   <Sparkles className="w-3.5 h-3.5" />
                   <span>Live AI Generated Plan</span>
                 </div>
@@ -159,7 +159,7 @@ export default function ItineraryView({ itinerary, onUpdateItinerary, onReset, d
 
               {/* Companion Type Badge */}
               {itinerary.companionType && (
-                <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-indigo-500/20 border border-indigo-400/30 text-indigo-200 rounded-full text-xs font-semibold">
+                <div className="inline-flex items-center gap-1 px-2.5 py-0.5 sm:px-3 sm:py-1 bg-indigo-500/20 border border-indigo-400/30 text-indigo-200 rounded-full text-[11px] sm:text-xs font-semibold">
                   <Users className="w-3.5 h-3.5 text-indigo-400" />
                   <span>{itinerary.companionType}</span>
                 </div>
@@ -167,9 +167,9 @@ export default function ItineraryView({ itinerary, onUpdateItinerary, onReset, d
             </div>
 
             {/* Currency Selector & Per-Pax Budget Badge */}
-            <div className="flex items-center gap-2 flex-wrap">
-              <div className="flex items-center gap-1 bg-white/10 border border-white/20 px-2 py-1 rounded-full text-xs no-print">
-                <Globe className="w-3.5 h-3.5 text-indigo-300" />
+            <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
+              <div className="flex items-center gap-1 bg-white/10 border border-white/20 px-2 py-1 rounded-full text-[11px] sm:text-xs no-print">
+                <Globe className="w-3.5 h-3.5 text-indigo-300 shrink-0" />
                 <select
                   value={currency}
                   onChange={(e) => setCurrency(e.target.value)}
@@ -184,8 +184,8 @@ export default function ItineraryView({ itinerary, onUpdateItinerary, onReset, d
               </div>
 
               {itinerary.estimatedBudgetPerPax && (
-                <div className="inline-flex items-center gap-1.5 px-3.5 py-1 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-full text-xs font-bold shadow-md shadow-emerald-900/30">
-                  <DollarSign className="w-3.5 h-3.5" />
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-full text-[11px] sm:text-xs font-bold shadow-md shadow-emerald-900/30">
+                  <DollarSign className="w-3.5 h-3.5 shrink-0" />
                   <span>Est. Budget: {formattedTotalBudget}</span>
                 </div>
               )}
@@ -218,24 +218,24 @@ export default function ItineraryView({ itinerary, onUpdateItinerary, onReset, d
               <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
                 {itinerary.tripTitle}
               </h2>
-              <div className="flex items-center gap-4 text-xs sm:text-sm text-indigo-200 mt-2 flex-wrap">
+              <div className="flex items-center gap-3 sm:gap-4 text-xs sm:text-sm text-indigo-200 mt-2 flex-wrap">
                 <span className="flex items-center gap-1">
-                  <MapPin className="w-4 h-4 text-indigo-400" />
+                  <MapPin className="w-4 h-4 text-indigo-400 shrink-0" />
                   {itinerary.destination}
                 </span>
                 <span className="flex items-center gap-1">
-                  <Calendar className="w-4 h-4 text-indigo-400" />
+                  <Calendar className="w-4 h-4 text-indigo-400 shrink-0" />
                   {itinerary.duration}
                 </span>
               </div>
             </div>
 
-            {/* Action Bar: Save Trip, Export PDF, Share Trip, New Plan */}
-            <div className="flex items-center gap-2 flex-wrap self-start sm:self-center no-print">
+            {/* Action Bar: Grid on Mobile, Flex on Desktop */}
+            <div className="grid grid-cols-2 sm:flex sm:items-center gap-2 w-full sm:w-auto self-start sm:self-center no-print">
               <button
                 onClick={handleSaveCurrentTrip}
                 title="Save itinerary to browser localStorage"
-                className="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold rounded-xl border border-indigo-400/30 flex items-center gap-1.5 transition-all shadow-sm"
+                className="px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold rounded-xl border border-indigo-400/30 flex items-center justify-center gap-1.5 transition-all shadow-sm"
               >
                 {isSaved ? <BookmarkCheck className="w-3.5 h-3.5 text-indigo-200" /> : <BookmarkPlus className="w-3.5 h-3.5" />}
                 <span>{isSaved ? 'Saved!' : 'Save Trip'}</span>
@@ -244,7 +244,7 @@ export default function ItineraryView({ itinerary, onUpdateItinerary, onReset, d
               <button
                 onClick={handleShareTrip}
                 title="Copy trip text summary for WhatsApp or messages"
-                className="px-3.5 py-2 bg-emerald-600/80 hover:bg-emerald-600 text-white text-xs font-semibold rounded-xl border border-emerald-400/30 flex items-center gap-1.5 transition-all shadow-sm"
+                className="px-3 py-2 bg-emerald-600/80 hover:bg-emerald-600 text-white text-xs font-semibold rounded-xl border border-emerald-400/30 flex items-center justify-center gap-1.5 transition-all shadow-sm"
               >
                 {copiedShare ? <Check className="w-3.5 h-3.5 text-emerald-200" /> : <Share2 className="w-3.5 h-3.5" />}
                 <span>{copiedShare ? 'Copied!' : 'Share Trip'}</span>
@@ -253,7 +253,7 @@ export default function ItineraryView({ itinerary, onUpdateItinerary, onReset, d
               <button
                 onClick={handleExportPDF}
                 title="Export or print itinerary to clean PDF"
-                className="px-3.5 py-2 bg-white/10 hover:bg-white/20 text-white text-xs font-semibold rounded-xl border border-white/20 flex items-center gap-1.5 transition-colors"
+                className="px-3 py-2 bg-white/10 hover:bg-white/20 text-white text-xs font-semibold rounded-xl border border-white/20 flex items-center justify-center gap-1.5 transition-colors"
               >
                 <Printer className="w-3.5 h-3.5" />
                 <span>Export PDF</span>
@@ -262,7 +262,7 @@ export default function ItineraryView({ itinerary, onUpdateItinerary, onReset, d
               <button
                 onClick={onReset}
                 title="Start a new trip plan"
-                className="px-3.5 py-2 bg-white/10 hover:bg-white/20 text-white text-xs font-semibold rounded-xl border border-white/20 flex items-center gap-1.5 transition-colors"
+                className="px-3 py-2 bg-white/10 hover:bg-white/20 text-white text-xs font-semibold rounded-xl border border-white/20 flex items-center justify-center gap-1.5 transition-colors"
               >
                 <RefreshCw className="w-3.5 h-3.5" />
                 <span>New Plan</span>
@@ -270,7 +270,7 @@ export default function ItineraryView({ itinerary, onUpdateItinerary, onReset, d
             </div>
           </div>
 
-          <p className="text-sm text-indigo-100/80 pt-2 border-t border-indigo-700/50 leading-relaxed">
+          <p className="text-xs sm:text-sm text-indigo-100/80 pt-2 border-t border-indigo-700/50 leading-relaxed">
             {itinerary.summary}
           </p>
 
@@ -285,13 +285,13 @@ export default function ItineraryView({ itinerary, onUpdateItinerary, onReset, d
 
           {/* Weather & Season Advisor Card */}
           {itinerary.weatherAdvisor && (
-            <div className="p-4 bg-gradient-to-r from-amber-500/10 to-indigo-500/10 backdrop-blur-md rounded-xl border border-white/10 space-y-2 text-xs">
-              <div className="flex items-center gap-1.5 font-bold text-amber-300">
-                <SunMedium className="w-4 h-4 text-amber-400" />
+            <div className="p-3.5 sm:p-4 bg-gradient-to-r from-amber-500/10 to-indigo-500/10 backdrop-blur-md rounded-xl border border-white/10 space-y-2 text-xs">
+              <div className="flex items-center gap-1.5 font-bold text-amber-300 text-xs">
+                <SunMedium className="w-4 h-4 text-amber-400 shrink-0" />
                 <span>Weather & Season Advisor for {itinerary.destination}</span>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1 text-slate-200">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-3 pt-1 text-slate-200">
                 <div className="flex items-center gap-2">
                   <SunMedium className="w-4 h-4 text-amber-400 shrink-0" />
                   <div>
@@ -327,7 +327,7 @@ export default function ItineraryView({ itinerary, onUpdateItinerary, onReset, d
       }`}>
         <button
           onClick={() => setActiveTab('itinerary')}
-          className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
+          className={`flex-1 sm:flex-initial px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
             activeTab === 'itinerary'
               ? 'bg-indigo-600 text-white shadow-sm'
               : darkMode
@@ -341,7 +341,7 @@ export default function ItineraryView({ itinerary, onUpdateItinerary, onReset, d
 
         <button
           onClick={() => setActiveTab('packing')}
-          className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
+          className={`flex-1 sm:flex-initial px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
             activeTab === 'packing'
               ? 'bg-indigo-600 text-white shadow-sm'
               : darkMode
@@ -363,7 +363,7 @@ export default function ItineraryView({ itinerary, onUpdateItinerary, onReset, d
           </div>
 
           {/* Days Breakdown */}
-          <div className="space-y-6">
+          <div className="space-y-5 sm:space-y-6">
             {itinerary.days.map((day) => (
               <DayCard
                 key={day.dayNumber}
