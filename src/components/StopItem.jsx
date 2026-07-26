@@ -4,20 +4,36 @@ import { useState } from 'react';
 import { ChevronDown, ChevronUp, Trash2, ArrowUp, ArrowDown, MapPin, Clock, DollarSign, ExternalLink } from 'lucide-react';
 import { convertCurrencyString } from '@/lib/currencyConverter';
 
-const CATEGORY_COLORS = {
-  Sightseeing: 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/60 dark:text-blue-300 dark:border-blue-800',
-  Food: 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-800',
-  Culture: 'bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-950/60 dark:text-purple-300 dark:border-purple-800',
-  Relaxation: 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800',
-  Shopping: 'bg-pink-50 text-pink-700 border-pink-200 dark:bg-pink-950/60 dark:text-pink-300 dark:border-pink-800',
-  Adventure: 'bg-orange-50 text-orange-700 border-orange-200 dark:bg-orange-950/60 dark:text-orange-300 dark:border-orange-800',
-  General: 'bg-slate-50 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700'
+const getCategoryStyle = (category, darkMode) => {
+  if (darkMode) {
+    const darkStyles = {
+      Sightseeing: 'bg-blue-950/80 text-blue-300 border-blue-800',
+      Food: 'bg-amber-950/80 text-amber-300 border-amber-800',
+      Culture: 'bg-purple-950/80 text-purple-300 border-purple-800',
+      Relaxation: 'bg-emerald-950/80 text-emerald-300 border-emerald-800',
+      Shopping: 'bg-pink-950/80 text-pink-300 border-pink-800',
+      Adventure: 'bg-orange-950/80 text-orange-300 border-orange-800',
+      General: 'bg-slate-800 text-slate-300 border-slate-700'
+    };
+    return darkStyles[category] || darkStyles.General;
+  } else {
+    const lightStyles = {
+      Sightseeing: 'bg-blue-50 text-blue-700 border-blue-200',
+      Food: 'bg-amber-50 text-amber-700 border-amber-200',
+      Culture: 'bg-purple-50 text-purple-700 border-purple-200',
+      Relaxation: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+      Shopping: 'bg-pink-50 text-pink-700 border-pink-200',
+      Adventure: 'bg-orange-50 text-orange-700 border-orange-200',
+      General: 'bg-slate-50 text-slate-700 border-slate-200'
+    };
+    return lightStyles[category] || lightStyles.General;
+  }
 };
 
 export default function StopItem({ stop, isFirst, isLast, onMoveUp, onMoveDown, onDelete, destination, currency = 'USD', darkMode }) {
   const [isExpanded, setIsExpanded] = useState(false);
 
-  const categoryStyle = CATEGORY_COLORS[stop.category] || CATEGORY_COLORS.General;
+  const categoryStyle = getCategoryStyle(stop.category, darkMode);
   
   const mapSearchQuery = encodeURIComponent(`${stop.title} ${stop.location || ''} ${destination || ''}`.trim());
   const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${mapSearchQuery}`;
@@ -39,7 +55,7 @@ export default function StopItem({ stop, isFirst, isLast, onMoveUp, onMoveDown, 
                 ? 'bg-slate-800 text-slate-300 border-slate-700'
                 : 'bg-slate-50 text-slate-600 border-slate-200'
             }`}>
-              <Clock className={`w-3 h-3 ${darkMode ? 'text-slate-400' : 'text-slate-400'}`} />
+              <Clock className="w-3 h-3 text-slate-400" />
               {stop.time}
             </span>
 
