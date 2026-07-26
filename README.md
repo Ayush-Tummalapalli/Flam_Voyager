@@ -7,7 +7,7 @@
 
 ## 🌟 Live Demo & Architecture
 
-- **Live Local App**: `http://localhost:3000`
+- **Live link **: [https://flam-voyager.vercel.app/](https://flam-voyager.vercel.app/)
 - **GitHub Repository**: [https://github.com/Ayush-Tummalapalli/Flam_Voyager.git](https://github.com/Ayush-Tummalapalli/Flam_Voyager.git)
 
 ---
