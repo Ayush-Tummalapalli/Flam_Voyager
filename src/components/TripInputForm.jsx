@@ -48,12 +48,14 @@ export default function TripInputForm({ onSubmit, onInstantDemo, isLoading, dark
       
       {/* Quick Demo Trips Banner */}
       <div className={`p-3.5 sm:p-4 rounded-xl border space-y-2.5 ${
-        darkMode ? 'bg-gradient-to-r from-amber-950/40 via-indigo-950/40 to-slate-900 border-amber-900/40' : 'bg-gradient-to-r from-amber-50 via-indigo-50 to-purple-50 border-amber-200/70'
+        darkMode 
+          ? 'bg-indigo-950/40 border-indigo-900/60' 
+          : 'bg-indigo-50/60 border-indigo-100'
       }`}>
         <div className="flex items-center justify-between flex-wrap gap-1">
-          <div className="flex items-center gap-1.5 font-bold text-xs text-amber-600 dark:text-amber-400">
-            <Zap className="w-4 h-4 text-amber-500 fill-amber-500 shrink-0" />
-            <span>⚡ Quick Demo Trips</span>
+          <div className="flex items-center gap-1.5 font-bold text-xs text-indigo-600 dark:text-indigo-400">
+            <Zap className="w-4 h-4 text-indigo-500 fill-indigo-500 shrink-0" />
+            <span>Quick Demo Trips</span>
           </div>
           <span className="text-[10px] uppercase tracking-wider font-bold text-indigo-600 dark:text-indigo-400">
             Instant Load
@@ -70,7 +72,7 @@ export default function TripInputForm({ onSubmit, onInstantDemo, isLoading, dark
               className={`px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-semibold border flex items-center justify-center gap-1 transition-all shadow-2xs hover:scale-[1.02] disabled:opacity-50 ${
                 darkMode
                   ? 'bg-slate-800 hover:bg-indigo-600 hover:text-white text-slate-200 border-slate-700'
-                  : 'bg-white hover:bg-indigo-600 hover:text-white text-slate-800 border-amber-200/90'
+                  : 'bg-white hover:bg-indigo-600 hover:text-white text-slate-800 border-indigo-200/80'
               }`}
             >
               <span>{demo.label}</span>
