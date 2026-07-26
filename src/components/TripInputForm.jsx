@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Sparkles, Send, Users } from 'lucide-react';
+import { Sparkles, Send, Users, Zap } from 'lucide-react';
 
 const PRESET_PROMPTS = [
   "3 days in Tokyo exploring culture, anime & street food",
@@ -17,7 +17,14 @@ const COMPANION_OPTIONS = [
   { label: '🥳 Group of Friends', value: 'Group of Friends' }
 ];
 
-export default function TripInputForm({ onSubmit, isLoading, darkMode }) {
+const INSTANT_DEMOS = [
+  { label: '🗼 Tokyo 3 Days', prompt: '3 days in Tokyo exploring culture & food', companion: 'Family with Kids' },
+  { label: '🥐 Paris Weekend', prompt: 'Weekend trip to Paris romantic highlights', companion: 'Couple / Romantic' },
+  { label: '🏖️ Goa 5 Days', prompt: '5-day beach & nightlife trip to Goa', companion: 'Group of Friends' },
+  { label: '🏛️ Rome 4 Days', prompt: '4 days in Rome exploring historical sights', companion: 'Solo Traveler' }
+];
+
+export default function TripInputForm({ onSubmit, onInstantDemo, isLoading, darkMode }) {
   const [prompt, setPrompt] = useState('');
   const [companionType, setCompanionType] = useState('Solo Traveler');
 
@@ -33,15 +40,50 @@ export default function TripInputForm({ onSubmit, isLoading, darkMode }) {
   };
 
   return (
-    <div className={`rounded-2xl p-6 mb-8 transition-all space-y-4 border ${
+    <div className={`rounded-2xl p-6 mb-8 transition-all space-y-5 border ${
       darkMode
         ? 'bg-slate-900 border-slate-800 shadow-xl'
         : 'bg-white border-slate-100 shadow-sm'
     }`}>
+      
+      {/* Instant Demo Presets Banner for Interview Evaluators */}
+      <div className={`p-4 rounded-xl border space-y-2.5 ${
+        darkMode ? 'bg-gradient-to-r from-amber-950/40 via-indigo-950/40 to-slate-900 border-amber-900/40' : 'bg-gradient-to-r from-amber-50 via-indigo-50 to-purple-50 border-amber-200/70'
+      }`}>
+        <div className="flex items-center justify-between flex-wrap gap-1">
+          <div className="flex items-center gap-1.5 font-bold text-xs text-amber-600 dark:text-amber-400">
+            <Zap className="w-4 h-4 text-amber-500 fill-amber-500" />
+            <span>Evaluator Quick-Test (1-Click Instant Load Demos)</span>
+          </div>
+          <span className="text-[10px] uppercase tracking-wider font-bold text-indigo-600 dark:text-indigo-400">
+            0ms API Waiting Time
+          </span>
+        </div>
+
+        <div className="flex flex-wrap gap-2 pt-0.5">
+          {INSTANT_DEMOS.map((demo, idx) => (
+            <button
+              key={idx}
+              type="button"
+              onClick={() => onInstantDemo(demo.prompt, demo.companion)}
+              disabled={isLoading}
+              className={`px-3 py-1.5 rounded-xl text-xs font-semibold border flex items-center gap-1 transition-all shadow-2xs hover:scale-[1.02] disabled:opacity-50 ${
+                darkMode
+                  ? 'bg-slate-800 hover:bg-indigo-600 hover:text-white text-slate-200 border-slate-700'
+                  : 'bg-white hover:bg-indigo-600 hover:text-white text-slate-800 border-amber-200/90'
+              }`}
+            >
+              <span>{demo.label}</span>
+              <span className="text-[10px] opacity-75 font-normal">({demo.companion.split(' ')[0]})</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
       <div className="flex items-center justify-between flex-wrap gap-2">
         <div className="flex items-center gap-2 text-indigo-500 font-semibold text-sm">
           <Sparkles className="w-4 h-4" />
-          <span>Describe your ideal vacation</span>
+          <span>Or describe your own travel plan</span>
         </div>
 
         {/* Companion Filter Selector Label */}

@@ -43,6 +43,14 @@ export default function Home() {
     setItinerary(savedItinerary);
   };
 
+  const handleInstantDemo = (promptText, companion) => {
+    setError(null);
+    setLastPrompt(promptText);
+    setLastCompanion(companion);
+    const demoData = getMockItinerary(promptText, null, companion);
+    setItinerary(demoData);
+  };
+
   const toggleDarkMode = () => {
     const newMode = !darkMode;
     setDarkMode(newMode);
@@ -189,7 +197,12 @@ export default function Home() {
         )}
 
         {/* Input Form */}
-        <TripInputForm onSubmit={generateItinerary} isLoading={isLoading} darkMode={darkMode} />
+        <TripInputForm
+          onSubmit={generateItinerary}
+          onInstantDemo={handleInstantDemo}
+          isLoading={isLoading}
+          darkMode={darkMode}
+        />
 
         {/* Error State */}
         {error && (
