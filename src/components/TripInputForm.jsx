@@ -46,17 +46,17 @@ export default function TripInputForm({ onSubmit, onInstantDemo, isLoading, dark
         : 'bg-white border-slate-100 shadow-sm'
     }`}>
       
-      {/* Instant Demo Presets Banner for Interview Evaluators */}
+      {/* Quick Demo Trips Banner */}
       <div className={`p-4 rounded-xl border space-y-2.5 ${
         darkMode ? 'bg-gradient-to-r from-amber-950/40 via-indigo-950/40 to-slate-900 border-amber-900/40' : 'bg-gradient-to-r from-amber-50 via-indigo-50 to-purple-50 border-amber-200/70'
       }`}>
         <div className="flex items-center justify-between flex-wrap gap-1">
           <div className="flex items-center gap-1.5 font-bold text-xs text-amber-600 dark:text-amber-400">
             <Zap className="w-4 h-4 text-amber-500 fill-amber-500" />
-            <span>Evaluator Quick-Test (1-Click Instant Load Demos)</span>
+            <span>⚡ Quick Demo Trips</span>
           </div>
           <span className="text-[10px] uppercase tracking-wider font-bold text-indigo-600 dark:text-indigo-400">
-            0ms API Waiting Time
+            Instant Load
           </span>
         </div>
 
