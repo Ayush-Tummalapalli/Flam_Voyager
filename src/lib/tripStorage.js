@@ -21,14 +21,23 @@ export function saveTrip(itinerary) {
   try {
     const existing = getSavedTrips();
     
-    // Check if already saved by tripTitle & destination
-    const existingIndex = existing.findIndex(t => t.id === itinerary.savedId || (t.tripTitle === itinerary.tripTitle && t.destination === itinerary.destination));
+    // Unique ID for each saved trip session
+    const uniqueSavedId = itinerary.savedId || `saved-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
 
     const savedEntry = {
-      savedId: itinerary.savedId || `saved-${Date.now()}`,
-      savedAt: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' }),
-      ...itinerary
+      ...itinerary,
+      savedId: uniqueSavedId,
+      savedAt: new Date().toLocaleDateString('en-US', { 
+        month: 'short', 
+        day: 'numeric', 
+        year: 'numeric', 
+        hour: '2-digit', 
+        minute: '2-digit' 
+      })
     };
+
+    // Only update if exact savedId matches (i.e. editing an existing saved trip), otherwise add new
+    const existingIndex = itinerary.savedId ? existing.findIndex(t => t.savedId === itinerary.savedId) : -1;
 
     if (existingIndex >= 0) {
       existing[existingIndex] = savedEntry;
@@ -37,7 +46,7 @@ export function saveTrip(itinerary) {
     }
 
     localStorage.setItem(STORAGE_KEY, JSON.stringify(existing));
-    return savedEntry.savedId;
+    return uniqueSavedId;
   } catch (err) {
     console.error('Error saving trip to localStorage:', err);
     return false;
