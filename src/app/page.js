@@ -6,10 +6,9 @@ import ItineraryView from '@/components/ItineraryView';
 import ErrorAlert from '@/components/ErrorAlert';
 import LoadingSkeleton from '@/components/LoadingSkeleton';
 import SavedTripsDrawer from '@/components/SavedTripsDrawer';
-import CommandPalette from '@/components/CommandPalette';
 import { getMockItinerary } from '@/lib/mockItinerary';
 import { getSavedTrips, deleteSavedTrip } from '@/lib/tripStorage';
-import { Compass, ShieldCheck, Sun, Moon, BookmarkCheck, Command } from 'lucide-react';
+import { Compass, ShieldCheck, Sun, Moon, BookmarkCheck } from 'lucide-react';
 
 export default function Home() {
   const [itinerary, setItinerary] = useState(null);
@@ -20,7 +19,6 @@ export default function Home() {
   const [darkMode, setDarkMode] = useState(false);
   const [savedTrips, setSavedTrips] = useState([]);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [isCommandOpen, setIsCommandOpen] = useState(false);
 
   useEffect(() => {
     // Load theme preference from localStorage
@@ -30,16 +28,6 @@ export default function Home() {
     }
     // Load saved trips from localStorage
     setSavedTrips(getSavedTrips());
-
-    // Global Cmd+K / Ctrl+K keyboard shortcut listener
-    const handleKeyDown = (e) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
-        e.preventDefault();
-        setIsCommandOpen(prev => !prev);
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
   const refreshSavedTrips = () => {
@@ -140,20 +128,6 @@ export default function Home() {
           </div>
 
           <div className="flex items-center gap-2 sm:gap-3">
-            {/* Command Palette Button (⌘K) */}
-            <button
-              onClick={() => setIsCommandOpen(true)}
-              title="Open Command Palette (Cmd + K)"
-              className={`px-2.5 py-1.5 rounded-xl border text-xs font-bold flex items-center gap-1.5 transition-all ${
-                darkMode
-                  ? 'bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700'
-                  : 'bg-slate-100 border-slate-200 text-slate-700 hover:bg-slate-200'
-              }`}
-            >
-              <Command className="w-3.5 h-3.5 text-indigo-500" />
-              <span className="hidden sm:inline">⌘K</span>
-            </button>
-
             {/* My Saved Trips Drawer Button */}
             <button
               onClick={() => setIsDrawerOpen(true)}
@@ -185,29 +159,18 @@ export default function Home() {
               {darkMode ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-indigo-600" />}
               <span className="hidden sm:inline">{darkMode ? 'Light' : 'Dark'}</span>
             </button>
+
+            <div className={`hidden md:flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full border ${
+              darkMode 
+                ? 'bg-emerald-950/60 text-emerald-300 border-emerald-800' 
+                : 'bg-emerald-50 text-emerald-700 border-emerald-200'
+            }`}>
+              <ShieldCheck className="w-3.5 h-3.5" />
+              <span>Key Secured Server-side</span>
+            </div>
           </div>
         </div>
       </header>
-
-      {/* Command Palette Modal */}
-      <CommandPalette
-        isOpen={isCommandOpen}
-        onClose={() => setIsCommandOpen(false)}
-        darkMode={darkMode}
-        toggleDarkMode={toggleDarkMode}
-        onExportPDF={() => window.print()}
-        onShareTrip={() => {
-          if (itinerary) {
-            let text = `✈️ *${itinerary.tripTitle}*\n📍 *Destination*: ${itinerary.destination}\n📅 *Duration*: ${itinerary.duration}\n\n🚀 *Planned with FlamVoyager*`;
-            navigator.clipboard.writeText(text);
-            alert('Trip summary copied to clipboard!');
-          }
-        }}
-        onOpenSavedTrips={() => setIsDrawerOpen(true)}
-        onInstantDemo={handleInstantDemo}
-        onSwitchTab={() => {}}
-        onSelectCurrency={() => {}}
-      />
 
       {/* Saved Trips Side Drawer */}
       <SavedTripsDrawer
@@ -228,7 +191,7 @@ export default function Home() {
               Plan Your Next Adventure in Seconds
             </h2>
             <p className={`text-sm leading-relaxed ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
-              Describe your destination, trip length, or vibe. FlamVoyager generates an interactive day-by-day itinerary tailored to your travel companions. Press <kbd className="px-1.5 py-0.5 border rounded text-xs font-mono font-bold">⌘K</kbd> for quick commands.
+              Describe your destination, trip length, or vibe. FlamVoyager generates an interactive day-by-day itinerary tailored to your travel companions.
             </p>
           </div>
         )}
