@@ -1,7 +1,7 @@
 # 🚀 FlamVoyager — AI Travel Planner
 
 > **Frontend Internship Assignment Submission for Flam**  
-> *Built with Next.js 14 (App Router, JavaScript), Tailwind CSS, Lucide Icons, and Dual LLM Engine (Groq Llama 3.3 70B & Google Gemini 1.5 Flash).*
+> *Built with Next.js 14 (App Router, JavaScript), Tailwind CSS, Lucide Icons, and LLM Engine (Active Provider: Groq Llama 3.3 70B with Gemini 1.5 Flash fallback support).*
 
 ---
 
@@ -55,7 +55,7 @@ cd Flam_Voyager
 npm install
 
 # 3. Create .env.local with your Groq or Gemini API Key
-echo "GROQ_API_KEY=your_groq_api_key_here" > .env.local
+echo "GROQ_API_KEY=gsk_your_groq_api_key_here" > .env.local
 
 # 4. Run Development Server
 npm run dev
@@ -75,6 +75,9 @@ npm start
 
 All LLM calls are routed through serverless API proxy routes (`/api/generate` & `/api/refine`).  
 **API keys are strictly stored on the server environment and never shipped or exposed to client browsers.**
+
+- **Active Model Provider**: **Groq (Llama 3.3 70B Versatile)** — chosen for ultra-fast response times (~1.5s) and strict JSON mode compliance.
+- **Provider Fallback**: Google Gemini 1.5 Flash support is built into the backend if a Gemini key is provided.
 
 ---
 
