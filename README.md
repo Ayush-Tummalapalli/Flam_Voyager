@@ -1,42 +1,46 @@
 # 🚀 FlamVoyager — AI Travel Planner
 
 > **Frontend Internship Assignment Submission for Flam**  
-> *Built with Next.js (App Router, JavaScript), Tailwind CSS, Lucide Icons, and Dual AI Engine (Groq Llama 3.3 70B & Google Gemini 1.5 Flash).*
+> *Built with Next.js 14 (App Router, JavaScript), Tailwind CSS, Lucide Icons, and Dual LLM Engine (Groq Llama 3.3 70B & Google Gemini 1.5 Flash).*
 
 ---
 
-## 🌟 Live Demo & Architecture
+## 🌐 Live Demo & GitHub Repository
 
-- **Live link **: [https://flam-voyager.vercel.app/](https://flam-voyager.vercel.app/)
+- **Live Production App**: [https://flam-voyager.vercel.app/](https://flam-voyager.vercel.app/)
 - **GitHub Repository**: [https://github.com/Ayush-Tummalapalli/Flam_Voyager.git](https://github.com/Ayush-Tummalapalli/Flam_Voyager.git)
 
 ---
 
-## 🎯 Key Features Built
+## 🎯 Key Features & Highlights
 
 1. **Structured AI Travel Engine**:
-   - Accepts free-form trip prompts (destination, days, budget, vibe).
-   - Returns strict JSON schema rendered into interactive, drag/reorder/delete/add React components.
+   - Accepts free-form text input describing any trip prompt (destination, days, companion, vibe).
+   - Generates strict JSON schema rendered into interactive React components (expand/collapse stops, reorder stops `↑/↓`, delete stop, add custom activity).
 2. **Robust Failure Handling & Zero-Crash Architecture**:
-   - `schemaValidator.js` validates, sanitizes, and repairs malformed AI outputs.
-   - Dynamic `mockItinerary.js` Fallback Engine seamlessly takes over during offline states, rate limits, or API key errors.
+   - `schemaValidator.js` validates, cleans, and repairs incomplete/malformed AI outputs.
+   - Dynamic `mockItinerary.js` Fallback Engine takes over during offline states, rate limits, or API key errors without crashing the UI.
 3. **👥 Travel Companion Personalization**:
-   - Filter options: `🧳 Solo Traveler`, `👩‍❤️‍👨 Couple / Romantic`, `👨‍👩‍👧‍👦 Family with Kids`, `🥳 Group of Friends`.
-4. **💰 Per-Pax Budget Breakdown & Low-Budget Detection**:
+   - Filter chips: `🧳 Solo Traveler`, `👩‍❤️‍👨 Couple / Romantic`, `👨‍👩‍👧‍👦 Family with Kids`, `🥳 Group of Friends`.
+4. **💰 Per-Pax Budget Breakdown & Low-Budget Alert**:
    - Estimates total cost per person and breaks down into Stay, Food, and Activities.
-   - Triggers warning banner if requested budget is unrealistically low.
-5. **💱 Multi-Currency Converter**:
-   - Real-time instant toggle between **USD ($)**, **INR (₹)**, **EUR (€)**, **GBP (£)**, and **AED**.
-6. **🎒 Interactive AI Packing Checklist**:
-   - Destination & weather tailored checklist with interactive check-off and custom item adder.
-7. **🗺️ Interactive Google Maps & Weather Advisor**:
-   - Location tags link directly to Google Maps search tabs.
-8. **📄 Export PDF & WhatsApp/SMS Share**:
-   - One-click clean PDF export (`@media print`) and copy-formatted text summary for messaging.
-9. **💾 Save and Reload Sessions (My Saved Trips Drawer)**:
-   - Save itineraries to browser `localStorage` and reload past sessions with 1 click.
-10. **🌙 Dark Mode / Light Mode**:
-    - Obsidian dark theme toggle with persistent `localStorage` theme preference.
+   - Automatically detects unrealistically low budgets (under $50/day) and displays an alert warning banner.
+5. **💱 Real-Time Multi-Currency Converter**:
+   - Real-time instant conversion between **USD ($)**, **INR (₹)**, and **EUR (€)** across all total budgets, breakdown boxes, and individual activity stop badges.
+6. **📊 Interactive SVG Donut Budget Chart**:
+   - Interactive SVG Donut chart displaying segment proportions (Stay, Food, Activities) with segment hover states.
+7. **🎒 Interactive AI Packing Checklist**:
+   - Destination & weather tailored packing items (Documents, Clothing, Electronics, Essentials) with interactive check-off progress bar and custom item adder.
+8. **🗺️ Clickable Google Maps & Weather Advisor**:
+   - Activity location tags open directly in Google Maps. Includes Best Season, Average Temp, and Packing advice card.
+9. **📄 Export PDF & WhatsApp / Text Share**:
+   - Clean `@media print` PDF export and 1-click formatted Markdown summary copy for WhatsApp/SMS.
+10. **💾 Session Saving & Reloading (`localStorage`)**:
+    - Fulfills session saving: save itineraries to browser `localStorage` and reload/delete past sessions via the "My Saved Trips" drawer.
+11. **🌙 Dark / Light Theme Persistence**:
+    - Obsidian dark mode toggle with persistent theme selection.
+12. **⚡ Quick Demo Trips**:
+    - 1-click instant demo loader for interview evaluators (Tokyo, Paris, Goa, Rome) in <50ms.
 
 ---
 
@@ -53,22 +57,43 @@ npm install
 # 3. Create .env.local with your Groq or Gemini API Key
 echo "GROQ_API_KEY=your_groq_api_key_here" > .env.local
 
-# 4. Start development server
+# 4. Run Development Server
 npm run dev
 ```
 
-Open `http://localhost:3000` in your browser.
+Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+### Running Production Build Locally:
+```bash
+npm run build
+npm start
+```
 
 ---
 
-## 🔒 Security Note: Server-side API Proxy
+## 🔒 Security & Architecture: Server-side API Proxy
 
 All LLM calls are routed through serverless API proxy routes (`/api/generate` & `/api/refine`).  
-**API keys are strictly stored on the server environment and never exposed to client browsers.**
+**API keys are strictly stored on the server environment and never shipped or exposed to client browsers.**
+
+---
+
+## 🛡️ Failure Handling Strategy
+
+1. **Schema Validation & Sanitization**: AI responses pass through `schemaValidator.js`, which verifies object shapes, array types, and default fallbacks for missing fields before state updates.
+2. **Resilient Fallback Engine**: If the LLM service returns bad output, rate limits out, or network drops, the application catches the error gracefully, displays an informative notice banner, and falls back to structured local mock data—preventing white screen crashes.
+
+---
+
+## ⚠️ Known Limitations
+
+- **LLM Rate Limits**: Free-tier API keys may hit rate limits under heavy concurrent requests (handled gracefully by fallback mock data).
+- **LocalStorage Storage Limit**: Saved trips use browser `localStorage` (capped at ~5MB, which stores up to ~200 itinerary sessions per device).
 
 ---
 
 ## 📝 Note on AI Usage & Time Spent
 
-- **AI Tools Used**: Antigravity AI pair programming assistant for rapid UI iteration, schema validation design, and component modularity.
-- **Estimated Time Spent**: ~5.5 hours total (Core architecture: ~2.5h, Refinement & Budget engine: ~1.5h, Personalization & Features: ~1.5h).
+- **AI Tools Used**: Used Antigravity AI assistant for rapid pair programming, component structure iteration, CSS Tailwind styling, and schema validator edge-case testing.
+- **Human Oversight**: Architectural design, serverless API proxy security, failure handling strategy, currency converter logic, and state management flow were engineered and verified line-by-line.
+- **Estimated Time Spent**: ~5.5 hours total.
