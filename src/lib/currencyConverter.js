@@ -1,14 +1,12 @@
 /**
  * Currency Conversion Helper for FlamVoyager.
- * Supports USD ($), INR (₹), EUR (€), GBP (£), and AED (AED).
+ * Supports USD ($), INR (₹), and EUR (€).
  */
 
 export const CURRENCIES = {
   USD: { code: 'USD', symbol: '$', rate: 1.0, flag: '🇺🇸', name: 'USD ($)' },
   INR: { code: 'INR', symbol: '₹', rate: 84.0, flag: '🇮🇳', name: 'INR (₹)' },
   EUR: { code: 'EUR', symbol: '€', rate: 0.92, flag: '🇪🇺', name: 'EUR (€)' },
-  GBP: { code: 'GBP', symbol: '£', rate: 0.78, flag: '🇬🇧', name: 'GBP (£)' },
-  AED: { code: 'AED', symbol: 'AED ', rate: 3.67, flag: '🇦🇪', name: 'AED' },
 };
 
 /**

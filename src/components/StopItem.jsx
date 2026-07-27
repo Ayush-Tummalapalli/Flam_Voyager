@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { ChevronDown, ChevronUp, Trash2, ArrowUp, ArrowDown, MapPin, Clock, DollarSign, ExternalLink } from 'lucide-react';
+import { ChevronDown, ChevronUp, Trash2, ArrowUp, ArrowDown, MapPin, Clock, ExternalLink } from 'lucide-react';
 import { convertCurrencyString } from '@/lib/currencyConverter';
 
 const getCategoryStyle = (category, darkMode) => {
@@ -66,12 +66,11 @@ export default function StopItem({ stop, isFirst, isLast, onMoveUp, onMoveDown, 
             )}
 
             {formattedCost && (
-              <span className={`text-xs font-medium px-2 py-0.5 rounded-full border flex items-center gap-0.5 ${
+              <span className={`text-xs font-bold px-2 py-0.5 rounded-full border flex items-center gap-0.5 ${
                 darkMode
                   ? 'bg-emerald-950/60 text-emerald-300 border-emerald-800'
                   : 'bg-emerald-50 text-emerald-700 border-emerald-200'
               }`}>
-                <DollarSign className="w-3 h-3" />
                 {formattedCost}
               </span>
             )}
