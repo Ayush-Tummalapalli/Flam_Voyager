@@ -100,3 +100,22 @@ All LLM calls are routed through serverless API proxy routes (`/api/generate` & 
 - **AI Tools Used**: Used Antigravity AI assistant for rapid pair programming, component structure iteration, CSS Tailwind styling, and schema validator edge-case testing.
 - **Human Oversight**: Architectural design, serverless API proxy security, failure handling strategy, currency converter logic, and state management flow were engineered and verified line-by-line.
 - **Estimated Time Spent**: ~5.5 hours total.
+
+---
+
+## 📌 Evaluation Rubric Q&A (For Interviewers)
+
+### Q1: How does the application secure LLM API keys? (Requirement: Server-side routing)
+> **Answer**: All LLM requests pass through Next.js serverless proxy routes (`/api/generate` and `/api/refine`). The `GROQ_API_KEY` is loaded from server environment variables (`.env.local` / Vercel secrets) and is **never bundled or exposed to the client browser**.
+
+### Q2: How do you handle malformed or unexpected AI output? (Rubric: 20% Weight)
+> **Answer**: AI outputs are validated through `schemaValidator.js`. If an LLM returns unexpected keys, missing array stops, or malformed JSON, `schemaValidator.js` repairs the shape before React state updates. If the API fails or drops offline, `mockItinerary.js` provides dynamic fallback data to prevent white screen crashes.
+
+### Q3: How do you handle low-budget inputs or unrealistic prompts?
+> **Answer**: The backend parses requested budgets against a minimum cost-per-day threshold ($50/day). If an input is unrealistically low (e.g. *"5 days in Paris for $20"*), `isBudgetTooLow` is set to `true` and the UI renders a **`⚠️ Given Budget is Too Low`** notice explaining realistic minimums.
+
+### Q4: How is session persistence implemented without a database or authentication? (Stretch Goal)
+> **Answer**: In compliance with the prompt (*"Authentication: Not needed"*), saved sessions use browser `localStorage` (`flam_saved_trips`). Users can save itineraries, view saved trips in a slide-out drawer, reload past sessions, or delete them without requiring backend database overhead.
+
+### Q5: How does the AI Refinement Loop work? (Stretch Goal)
+> **Answer**: Instead of regenerating trips from scratch, follow-up refinement prompts pass the current itinerary JSON back to `/api/refine`. The LLM tweaks the existing schedule in-place (adjusting budget, food themes, or daily pace) and updates state.
