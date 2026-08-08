@@ -1,6 +1,6 @@
 # 🚀 Itinera AI — Travel Planner
 
-> **Frontend Internship Assignment Submission for Flam**  
+> **Frontend Internship Assignment Submission**  
 > *Built with Next.js 14 (App Router, JavaScript), Tailwind CSS, Lucide Icons, and LLM Engine (Active Provider: Groq Llama 3.3 70B with Gemini 1.5 Flash fallback support).*
 
 ---
@@ -115,7 +115,7 @@ All LLM calls are routed through serverless API proxy routes (`/api/generate` & 
 > **Answer**: The backend parses requested budgets against a minimum cost-per-day threshold ($50/day). If an input is unrealistically low (e.g. *"5 days in Paris for $20"*), `isBudgetTooLow` is set to `true` and the UI renders a **`⚠️ Given Budget is Too Low`** notice explaining realistic minimums.
 
 ### Q4: How is session persistence implemented without a database or authentication? (Stretch Goal)
-> **Answer**: In compliance with the prompt (*"Authentication: Not needed"*), saved sessions use browser `localStorage` (`flam_saved_trips`). Users can save itineraries, view saved trips in a slide-out drawer, reload past sessions, or delete them without requiring backend database overhead.
+> **Answer**: In compliance with the prompt (*"Authentication: Not needed"*), saved sessions use browser `localStorage` (`itinera_saved_trips`). Users can save itineraries, view saved trips in a slide-out drawer, reload past sessions, or delete them without requiring backend database overhead.
 
 ### Q5: How does the AI Refinement Loop work? (Stretch Goal)
 > **Answer**: Instead of regenerating trips from scratch, follow-up refinement prompts pass the current itinerary JSON back to `/api/refine`. The LLM tweaks the existing schedule in-place (adjusting budget, food themes, or daily pace) and updates state.
