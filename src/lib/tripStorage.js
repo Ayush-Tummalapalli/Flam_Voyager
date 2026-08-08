@@ -1,9 +1,9 @@
 /**
- * LocalStorage Trip Storage Helper for FlamVoyager.
+ * LocalStorage Trip Storage Helper for Itinera AI.
  * Allows saving, retrieving, loading, and deleting travel itinerary sessions.
  */
 
-const STORAGE_KEY = 'flam_saved_trips';
+const STORAGE_KEY = 'itinera_saved_trips';
 
 export function getSavedTrips() {
   if (typeof window === 'undefined') return [];

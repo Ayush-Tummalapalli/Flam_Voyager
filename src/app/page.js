@@ -22,7 +22,7 @@ export default function Home() {
 
   useEffect(() => {
     // Load theme preference from localStorage
-    const savedTheme = localStorage.getItem('flam_theme');
+    const savedTheme = localStorage.getItem('itinera_theme') || localStorage.getItem('flam_theme');
     if (savedTheme === 'dark') {
       setDarkMode(true);
     }
@@ -54,7 +54,7 @@ export default function Home() {
   const toggleDarkMode = () => {
     const newMode = !darkMode;
     setDarkMode(newMode);
-    localStorage.setItem('flam_theme', newMode ? 'dark' : 'light');
+    localStorage.setItem('itinera_theme', newMode ? 'dark' : 'light');
   };
 
   const generateItinerary = async (prompt, companionType = 'Solo Traveler') => {
