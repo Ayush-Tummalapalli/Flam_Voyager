@@ -1,5 +1,6 @@
 # 🚀 Itinera AI — Travel Planner
 
+> **Frontend Internship Assignment Submission for Flam**  
 > *Built with Next.js 14 (App Router, JavaScript), Tailwind CSS, Lucide Icons, and LLM Engine (Active Provider: Groq Llama 3.3 70B with Gemini 1.5 Flash fallback support).*
 
 ---
@@ -7,7 +8,7 @@
 ## 🌐 Live Demo & GitHub Repository
 
 - **Live Production App**: [https://itinera-ai-planner.vercel.app/](https://itinera-ai-planner.vercel.app/)
-- **GitHub Repository**: [https://github.com/Ayush-Tummalapalli/itenera_ai](https://github.com/Ayush-Tummalapalli/itenera_ai)
+- **GitHub Repository**: [https://github.com/Ayush-Tummalapalli/itinera_ai.git](https://github.com/Ayush-Tummalapalli/itinera_ai.git)
 
 ---
 
@@ -47,8 +48,8 @@
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/Ayush-Tummalapalli/Flam_Voyager.git
-cd Flam_Voyager
+git clone https://github.com/Ayush-Tummalapalli/itinera_ai.git
+cd itinera_ai
 
 # 2. Install dependencies
 npm install
