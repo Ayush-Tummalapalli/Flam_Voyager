@@ -1,50 +1,70 @@
-# 🚀 Itinera AI — Travel Planner
+# 🚀 Itinera AI — Smart AI Travel Planner
 
-> **Frontend Internship Assignment Submission**  
-> *Built with Next.js 14 (App Router, JavaScript), Tailwind CSS, Lucide Icons, and LLM Engine (Active Provider: Groq Llama 3.3 70B with Gemini 1.5 Flash fallback support).*
+[![Next.js](https://img.shields.io/badge/Next.js-14-black?logo=next.js)](https://nextjs.org/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.4-38BDF8?logo=tailwind-css)](https://tailwindcss.com/)
+[![Groq AI](https://img.shields.io/badge/Groq_AI-Llama_3.3_70B-f35815)](https://groq.com/)
+[![Deployment](https://img.shields.io/badge/Vercel-Production-000000?logo=vercel)](https://itinera-ai-planner.vercel.app/)
+
+> **Itinera AI** is an interactive, intelligent travel itinerary generator. It crafts custom day-by-day travel schedules tailored to your destination, travel companions, and budget preferences in seconds.
 
 ---
 
-## 🌐 Live Demo & GitHub Repository
+## 🌐 Live Demo & Repository
 
-- **Live Production App**: [https://itinera-ai-planner.vercel.app/](https://itinera-ai-planner.vercel.app/)
+- **Live Application**: [https://itinera-ai-planner.vercel.app/](https://itinera-ai-planner.vercel.app/)
 - **GitHub Repository**: [https://github.com/Ayush-Tummalapalli/itenera_ai.git](https://github.com/Ayush-Tummalapalli/itenera_ai.git)
 
 ---
 
-## 🎯 Key Features & Highlights
+## ✨ Key Features
 
-1. **Structured AI Travel Engine**:
-   - Accepts free-form text input describing any trip prompt (destination, days, companion, vibe).
-   - Generates strict JSON schema rendered into interactive React components (expand/collapse stops, reorder stops `↑/↓`, delete stop, add custom activity).
-2. **Robust Failure Handling & Zero-Crash Architecture**:
-   - `schemaValidator.js` validates, cleans, and repairs incomplete/malformed AI outputs.
-   - Dynamic `mockItinerary.js` Fallback Engine takes over during offline states, rate limits, or API key errors without crashing the UI.
+1. **🤖 Structured AI Itinerary Engine**:
+   - Generates realistic day-by-day travel schedules based on free-form prompts.
+   - Renders interactive React components: expand/collapse activity details, reorder stops (`↑/↓`), delete stops, or add custom activities.
+2. **🛡️ Resilient Zero-Crash Architecture**:
+   - `schemaValidator.js` sanitizes and repairs malformed AI outputs before state updates.
+   - Built-in fallback engine guarantees zero downtime during network drops or API rate limits.
 3. **👥 Travel Companion Personalization**:
-   - Filter chips: `🧳 Solo Traveler`, `👩‍❤️‍👨 Couple / Romantic`, `👨‍👩‍👧‍👦 Family with Kids`, `🥳 Group of Friends`.
-4. **💰 Per-Pax Budget Breakdown & Low-Budget Alert**:
-   - Estimates total cost per person and breaks down into Stay, Food, and Activities.
-   - Automatically detects unrealistically low budgets (under $50/day) and displays an alert warning banner.
+   - Tailors activities and pace based on companion filters: `Solo Traveler`, `Couple / Romantic`, `Family with Kids`, and `Group of Friends`.
+4. **💰 Per-Pax Budget Breakdown & Smart Alerts**:
+   - Calculates estimated cost per person and breaks down expenses into Stay, Food, and Activities.
+   - Automatically flags unrealistically low budgets with a helpful minimum recommended threshold notice.
 5. **💱 Real-Time Multi-Currency Converter**:
-   - Real-time instant conversion between **USD ($)**, **INR (₹)**, and **EUR (€)** across all total budgets, breakdown boxes, and individual activity stop badges.
+   - Instant real-time toggle between **USD ($)**, **INR (₹)**, and **EUR (€)** across total budgets, breakdown charts, and individual activity cost tags.
 6. **📊 Interactive SVG Donut Budget Chart**:
-   - Interactive SVG Donut chart displaying segment proportions (Stay, Food, Activities) with segment hover states.
+   - Responsive SVG Donut chart displaying cost proportions with interactive segment hover states.
 7. **🎒 Interactive AI Packing Checklist**:
-   - Destination & weather tailored packing items (Documents, Clothing, Electronics, Essentials) with interactive check-off progress bar and custom item adder.
+   - Destination-tailored packing lists (Documents, Clothing, Electronics, Essentials) with check-off progress tracking and custom item management.
 8. **🗺️ Clickable Google Maps & Weather Advisor**:
-   - Activity location tags open directly in Google Maps. Includes Best Season, Average Temp, and Packing advice card.
-9. **📄 Export PDF & WhatsApp / Text Share**:
-   - Clean `@media print` PDF export and 1-click formatted Markdown summary copy for WhatsApp/SMS.
-10. **💾 Session Saving & Reloading (`localStorage`)**:
-    - Fulfills session saving: save itineraries to browser `localStorage` and reload/delete past sessions via the "My Saved Trips" drawer.
-11. **🌙 Dark / Light Theme Persistence**:
-    - Obsidian dark mode toggle with persistent theme selection.
-12. **⚡ Quick Demo Trips**:
-    - 1-click instant demo loader for interview evaluators (Tokyo, Paris, Goa, Rome) in <50ms.
+   - Activity locations link directly to Google Maps search. Includes Best Season, Average Temp, and Packing advice cards.
+9. **📄 Export PDF & WhatsApp Sharing**:
+   - `@media print` optimized PDF exporter and 1-click Markdown summary copier for WhatsApp and text messaging.
+10. **💾 Session Saving & Persistence (`localStorage`)**:
+    - Save trips locally and manage past sessions via the "My Saved Trips" slide-out drawer.
+11. **🌙 Dark / Light Mode**:
+    - Smooth obsidian dark mode toggle with persistent theme selection.
+12. **⚡ Preset Quick Demos**:
+    - Instant demo loader for instant 0ms exploration (Tokyo, Paris, Goa, Rome).
 
 ---
 
-## 🛠️ Local Setup Instructions
+## 🛠️ Tech Stack & Architecture
+
+- **Frontend**: Next.js 14 (App Router, JavaScript), React 18, Tailwind CSS, Lucide Icons.
+- **Backend / API**: Next.js Serverless API Routes (`/api/generate` & `/api/refine`).
+- **AI Engine**: Groq API (`llama-3.3-70b-versatile`) with fallback support for Google Gemini API (`gemini-1.5-flash`).
+- **State & Persistence**: React Hooks + Browser `localStorage`.
+
+---
+
+## 🔒 Security
+
+All LLM API calls are routed through server-side proxy routes (`/api/generate` and `/api/refine`).  
+**API keys are kept strictly on the server environment and are never exposed to client browser bundles.**
+
+---
+
+## 🚀 Local Development Setup
 
 ```bash
 # 1. Clone the repository
@@ -54,16 +74,16 @@ cd itenera_ai
 # 2. Install dependencies
 npm install
 
-# 3. Create .env.local with your Groq or Gemini API Key
-echo "GROQ_API_KEY=gsk_your_groq_api_key_here" > .env.local
+# 3. Create .env.local with your API Key
+echo "GROQ_API_KEY=your_groq_api_key_here" > .env.local
 
-# 4. Run Development Server
+# 4. Start the development server
 npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-### Running Production Build Locally:
+### Production Build:
 ```bash
 npm run build
 npm start
@@ -71,51 +91,6 @@ npm start
 
 ---
 
-## 🔒 Security & Architecture: Server-side API Proxy
+## 📄 License
 
-All LLM calls are routed through serverless API proxy routes (`/api/generate` & `/api/refine`).  
-**API keys are strictly stored on the server environment and never shipped or exposed to client browsers.**
-
-- **Active Model Provider**: **Groq (Llama 3.3 70B Versatile)** — chosen for ultra-fast response times (~1.5s) and strict JSON mode compliance.
-- **Provider Fallback**: Google Gemini 1.5 Flash support is built into the backend if a Gemini key is provided.
-
----
-
-## 🛡️ Failure Handling Strategy
-
-1. **Schema Validation & Sanitization**: AI responses pass through `schemaValidator.js`, which verifies object shapes, array types, and default fallbacks for missing fields before state updates.
-2. **Resilient Fallback Engine**: If the LLM service returns bad output, rate limits out, or network drops, the application catches the error gracefully, displays an informative notice banner, and falls back to structured local mock data—preventing white screen crashes.
-
----
-
-## ⚠️ Known Limitations
-
-- **LLM Rate Limits**: Free-tier API keys may hit rate limits under heavy concurrent requests (handled gracefully by fallback mock data).
-- **LocalStorage Storage Limit**: Saved trips use browser `localStorage` (capped at ~5MB, which stores up to ~200 itinerary sessions per device).
-
----
-
-## 📝 Note on AI Usage & Time Spent
-
-- **AI Tools Used**: Used Antigravity AI assistant for rapid pair programming, component structure iteration, CSS Tailwind styling, and schema validator edge-case testing.
-- **Human Oversight**: Architectural design, serverless API proxy security, failure handling strategy, currency converter logic, and state management flow were engineered and verified line-by-line.
-- **Estimated Time Spent**: ~5.5 hours total.
-
----
-
-## 📌 Evaluation Rubric Q&A (For Interviewers)
-
-### Q1: How does the application secure LLM API keys? 
-> **Answer**: All LLM requests pass through Next.js serverless proxy routes (`/api/generate` and `/api/refine`). The `GROQ_API_KEY` is loaded from server environment variables (`.env.local` / Vercel secrets) and is **never bundled or exposed to the client browser**.
-
-### Q2: How do you handle malformed or unexpected AI output? 
-> **Answer**: AI outputs are validated through `schemaValidator.js`. If an LLM returns unexpected keys, missing array stops, or malformed JSON, `schemaValidator.js` repairs the shape before React state updates. If the API fails or drops offline, `mockItinerary.js` provides dynamic fallback data to prevent white screen crashes.
-
-### Q3: How do you handle low-budget inputs or unrealistic prompts?
-> **Answer**: The backend parses requested budgets against a minimum cost-per-day threshold ($50/day). If an input is unrealistically low (e.g. *"5 days in Paris for $20"*), `isBudgetTooLow` is set to `true` and the UI renders a **`⚠️ Given Budget is Too Low`** notice explaining realistic minimums.
-
-### Q4: How is session persistence implemented without a database or authentication? 
-> **Answer**: In compliance with the prompt (*"Authentication: Not needed"*), saved sessions use browser `localStorage` (`itinera_saved_trips`). Users can save itineraries, view saved trips in a slide-out drawer, reload past sessions, or delete them without requiring backend database overhead.
-
-### Q5: How does the AI Refinement Loop work? 
-> **Answer**: Instead of regenerating trips from scratch, follow-up refinement prompts pass the current itinerary JSON back to `/api/refine`. The LLM tweaks the existing schedule in-place (adjusting budget, food themes, or daily pace) and updates state.
+Distributed under the MIT License. See `LICENSE` for more information.
