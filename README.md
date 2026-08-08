@@ -1,6 +1,5 @@
 # 🚀 Itinera AI — Travel Planner
 
-> **Frontend Internship Assignment Submission for Flam**  
 > *Built with Next.js 14 (App Router, JavaScript), Tailwind CSS, Lucide Icons, and LLM Engine (Active Provider: Groq Llama 3.3 70B with Gemini 1.5 Flash fallback support).*
 
 ---
