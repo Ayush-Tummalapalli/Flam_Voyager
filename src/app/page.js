@@ -119,7 +119,7 @@ export default function Home() {
             </div>
             <div>
               <h1 className={`font-extrabold text-lg leading-none ${darkMode ? 'text-white' : 'text-slate-900'}`}>
-                FlamVoyager
+                Itinera AI
               </h1>
               <span className="text-[10px] uppercase font-bold tracking-wider text-indigo-500">
                 AI Travel Planner
@@ -191,7 +191,7 @@ export default function Home() {
               Plan Your Next Adventure in Seconds
             </h2>
             <p className={`text-sm leading-relaxed ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
-              Describe your destination, trip length, or vibe. FlamVoyager generates an interactive day-by-day itinerary tailored to your travel companions.
+              Describe your destination, trip length, or vibe. Itinera AI generates an interactive day-by-day itinerary tailored to your travel companions.
             </p>
           </div>
         )}

@@ -98,7 +98,7 @@ export default function ItineraryView({ itinerary, onUpdateItinerary, onReset, d
       text += `\n`;
     });
 
-    text += `🚀 *Planned with FlamVoyager*`;
+    text += `🚀 *Planned with Itinera AI*`;
 
     navigator.clipboard.writeText(text);
     setCopiedShare(true);
