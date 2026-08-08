@@ -88,9 +88,3 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 npm run build
 npm start
 ```
-
----
-
-## 📄 License
-
-Distributed under the MIT License. See `LICENSE` for more information.
