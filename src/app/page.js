@@ -8,7 +8,7 @@ import LoadingSkeleton from '@/components/LoadingSkeleton';
 import SavedTripsDrawer from '@/components/SavedTripsDrawer';
 import { getMockItinerary } from '@/lib/mockItinerary';
 import { getSavedTrips, deleteSavedTrip } from '@/lib/tripStorage';
-import { Compass, ShieldCheck, Sun, Moon, BookmarkCheck } from 'lucide-react';
+import { Compass, Sun, Moon, BookmarkCheck } from 'lucide-react';
 
 export default function Home() {
   const [itinerary, setItinerary] = useState(null);
@@ -159,15 +159,6 @@ export default function Home() {
               {darkMode ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-indigo-600" />}
               <span className="hidden sm:inline">{darkMode ? 'Light' : 'Dark'}</span>
             </button>
-
-            <div className={`hidden md:flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full border ${
-              darkMode 
-                ? 'bg-emerald-950/60 text-emerald-300 border-emerald-800' 
-                : 'bg-emerald-50 text-emerald-700 border-emerald-200'
-            }`}>
-              <ShieldCheck className="w-3.5 h-3.5" />
-              <span>Key Secured Server-side</span>
-            </div>
           </div>
         </div>
       </header>

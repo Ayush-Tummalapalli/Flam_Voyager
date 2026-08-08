@@ -4,8 +4,8 @@ import { Inter } from 'next/font/google';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata = {
-  title: 'FlamVoyager - AI Travel Planner',
-  description: 'AI-powered interactive travel itinerary generator built for Flam Frontend Internship Assignment.',
+  title: 'Itinera AI - Smart AI Travel Planner',
+  description: 'Interactive AI-powered travel itinerary generator tailored to your travel companions and budget.',
 };
 
 export default function RootLayout({ children }) {
