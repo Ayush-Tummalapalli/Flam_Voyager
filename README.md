@@ -8,7 +8,7 @@
 ## 🌐 Live Demo & GitHub Repository
 
 - **Live Production App**: [https://itinera-ai-planner.vercel.app/](https://itinera-ai-planner.vercel.app/)
-- **GitHub Repository**: [https://github.com/Ayush-Tummalapalli/itinera_ai.git](https://github.com/Ayush-Tummalapalli/itinera_ai.git)
+- **GitHub Repository**: [https://github.com/Ayush-Tummalapalli/itenera_ai.git](https://github.com/Ayush-Tummalapalli/itenera_ai.git)
 
 ---
 
@@ -48,8 +48,8 @@
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/Ayush-Tummalapalli/itinera_ai.git
-cd itinera_ai
+git clone https://github.com/Ayush-Tummalapalli/itenera_ai.git
+cd itenera_ai
 
 # 2. Install dependencies
 npm install
