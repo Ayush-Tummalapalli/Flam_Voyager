@@ -7,7 +7,7 @@
 ## 🌐 Live Demo & GitHub Repository
 
 - **Live Production App**: [https://itinera-ai-planner.vercel.app/](https://itinera-ai-planner.vercel.app/)
-- **GitHub Repository**: [https://github.com/Ayush-Tummalapalli/Flam_Voyager.git](https://github.com/Ayush-Tummalapalli/Flam_Voyager.git)
+- **GitHub Repository**: [https://github.com/Ayush-Tummalapalli/itenera_ai](https://github.com/Ayush-Tummalapalli/itenera_ai)
 
 ---
 
