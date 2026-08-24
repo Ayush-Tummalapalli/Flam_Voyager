@@ -2,6 +2,12 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 import { validateAndCleanItinerary } from '@/lib/schemaValidator';
 import { getMockItinerary } from '@/lib/mockItinerary';
 
+const OPENROUTER_MODELS = [
+  'google/gemma-4-31b:free',
+  'google/gemma-4-26b-a4b:free',
+  'nvidia/nemotron-3.5-lightning:free'
+];
+
 const GROQ_MODELS = [
   'llama-3.3-70b-versatile',
   'llama-3.1-70b-versatile',
@@ -10,46 +16,53 @@ const GROQ_MODELS = [
   'mixtral-8x7b-32768'
 ];
 
-async function callGroqWithFallback(apiKey, systemInstructions, userPrompt) {
+async function callOpenRouterWithFallback(apiKey, systemInstructions, userPrompt) {
   let lastError = null;
 
-  for (const modelId of GROQ_MODELS) {
-    // Attempt 1: json_object mode
+  for (const modelId of OPENROUTER_MODELS) {
     try {
-      console.log(`Attempting Groq API refinement with model: ${modelId} (json_object mode)...`);
-      const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      console.log(`Calling OpenRouter API refine with model: ${modelId}`);
+      const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${apiKey}`,
+          'HTTP-Referer': 'https://itinera-ai-planner.vercel.app',
+          'X-Title': 'Itinera AI Travel Planner',
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
           model: modelId,
           messages: [
             { role: 'system', content: systemInstructions },
-            { role: 'user', content: userPrompt }
-          ],
-          response_format: { type: 'json_object' }
+            { role: 'user', content: `${userPrompt}\n\nRespond strictly in valid JSON format.` }
+          ]
         })
       });
 
       if (response.ok) {
-        const groqData = await response.json();
-        const content = groqData.choices?.[0]?.message?.content;
+        const data = await response.json();
+        const content = data.choices?.[0]?.message?.content;
         if (content) return content;
       } else {
         const errText = await response.text();
-        console.warn(`Groq refine model ${modelId} json_object mode failed (${response.status}): ${errText}`);
-        lastError = new Error(`Groq Refine API Error (${response.status}): ${errText}`);
+        console.warn(`OpenRouter refine model ${modelId} failed (${response.status}): ${errText}`);
+        lastError = new Error(`OpenRouter Error (${response.status}): ${errText}`);
       }
     } catch (err) {
-      console.warn(`Error calling Groq refine model ${modelId}:`, err.message);
+      console.warn(`Error calling OpenRouter refine model ${modelId}:`, err.message);
       lastError = err;
     }
+  }
 
-    // Attempt 2: Standard mode
+  throw lastError || new Error('All OpenRouter refine models failed to return a response.');
+}
+
+async function callGroqWithFallback(apiKey, systemInstructions, userPrompt) {
+  let lastError = null;
+
+  for (const modelId of GROQ_MODELS) {
     try {
-      console.log(`Attempting Groq API refinement with model: ${modelId} (standard prompt mode)...`);
+      console.log(`Attempting Groq API refinement with model: ${modelId}...`);
       const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
         method: 'POST',
         headers: {
@@ -71,11 +84,11 @@ async function callGroqWithFallback(apiKey, systemInstructions, userPrompt) {
         if (content) return content;
       } else {
         const errText = await response.text();
-        console.warn(`Groq refine model ${modelId} standard mode failed (${response.status}): ${errText}`);
+        console.warn(`Groq refine model ${modelId} failed (${response.status}): ${errText}`);
         lastError = new Error(`Groq Refine API Error (${response.status}): ${errText}`);
       }
     } catch (err) {
-      console.warn(`Error calling Groq refine model ${modelId} standard mode:`, err.message);
+      console.warn(`Error calling Groq refine model ${modelId}:`, err.message);
       lastError = err;
     }
   }
@@ -106,9 +119,9 @@ export async function POST(req) {
       );
     }
 
-    const apiKey = process.env.GROQ_API_KEY || process.env.GEMINI_API_KEY;
+    const apiKey = process.env.OPENROUTER_API_KEY || process.env.GROQ_API_KEY || process.env.GEMINI_API_KEY;
 
-    if (!apiKey || apiKey.includes('your_gemini_api_key') || apiKey.includes('your_groq_api_key')) {
+    if (!apiKey || apiKey.includes('your_api_key')) {
       console.warn('API Key is missing. Returning modified fallback mock data.');
       const mockData = getMockItinerary(
         `${existingItinerary.destination || 'Trip'} (${userInstruction})`,
@@ -183,7 +196,13 @@ Return ONLY raw JSON object.
 
     let responseText = null;
 
-    if (apiKey.startsWith('gsk_')) {
+    if (apiKey.startsWith('sk-or-v1-')) {
+      responseText = await callOpenRouterWithFallback(
+        apiKey,
+        systemInstructions,
+        `Please update the itinerary following this instruction: "${userInstruction}"`
+      );
+    } else if (apiKey.startsWith('gsk_')) {
       responseText = await callGroqWithFallback(
         apiKey, 
         systemInstructions, 
