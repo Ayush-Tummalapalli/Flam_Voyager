@@ -2,6 +2,56 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 import { validateAndCleanItinerary } from '@/lib/schemaValidator';
 import { getMockItinerary } from '@/lib/mockItinerary';
 
+const GROQ_MODELS = [
+  'llama-3.3-70b-versatile',
+  'llama-3.1-8b-instant',
+  'llama3-70b-8192',
+  'mixtral-8x7b-32768'
+];
+
+async function callGroqWithFallback(apiKey, systemInstructions, userPrompt) {
+  let lastError = null;
+
+  for (const modelId of GROQ_MODELS) {
+    try {
+      console.log(`Attempting Groq API refinement with model: ${modelId}`);
+      const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${apiKey}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          model: modelId,
+          messages: [
+            { role: 'system', content: systemInstructions },
+            { role: 'user', content: userPrompt }
+          ],
+          response_format: { type: 'json_object' }
+        })
+      });
+
+      if (!response.ok) {
+        const errText = await response.text();
+        console.warn(`Groq refine model ${modelId} failed (${response.status}): ${errText}`);
+        lastError = new Error(`Groq Refine API Error (${response.status}): ${errText}`);
+        continue;
+      }
+
+      const groqData = await response.json();
+      const content = groqData.choices?.[0]?.message?.content;
+      if (content) {
+        return content;
+      }
+    } catch (err) {
+      console.warn(`Error calling Groq refine model ${modelId}:`, err.message);
+      lastError = err;
+    }
+  }
+
+  throw lastError || new Error('All Groq refine models failed to return a response.');
+}
+
 export async function POST(req) {
   let userInstruction = '';
   let existingItinerary = null;
@@ -103,31 +153,11 @@ Return ONLY raw JSON.
     let responseText = null;
 
     if (apiKey.startsWith('gsk_')) {
-      console.log('Refining via Groq API engine with packing checklist...');
-      const groqRes = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${apiKey}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          model: 'llama-3.3-70b-versatile',
-          messages: [
-            { role: 'system', content: systemInstructions },
-            { role: 'user', content: `Please update the itinerary following this instruction: "${userInstruction}"` }
-          ],
-          response_format: { type: 'json_object' }
-        })
-      });
-
-      if (!groqRes.ok) {
-        const errText = await groqRes.text();
-        throw new Error(`Groq Refine API Error (${groqRes.status}): ${errText}`);
-      }
-
-      const groqData = await groqRes.json();
-      responseText = groqData.choices?.[0]?.message?.content;
-
+      responseText = await callGroqWithFallback(
+        apiKey, 
+        systemInstructions, 
+        `Please update the itinerary following this instruction: "${userInstruction}"`
+      );
     } else {
       console.log('Refining via Google Gemini API engine...');
       const genAI = new GoogleGenerativeAI(apiKey);
