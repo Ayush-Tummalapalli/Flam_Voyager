@@ -4,6 +4,7 @@ import { getMockItinerary } from '@/lib/mockItinerary';
 
 const GROQ_MODELS = [
   'llama-3.3-70b-versatile',
+  'llama-3.1-70b-versatile',
   'llama-3.1-8b-instant',
   'llama3-70b-8192',
   'mixtral-8x7b-32768'
@@ -13,8 +14,9 @@ async function callGroqWithFallback(apiKey, systemInstructions, userPrompt) {
   let lastError = null;
 
   for (const modelId of GROQ_MODELS) {
+    // Attempt 1: With JSON response_format
     try {
-      console.log(`Attempting Groq API with model: ${modelId}`);
+      console.log(`Attempting Groq API with model ${modelId} (json_object mode)...`);
       const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
         method: 'POST',
         headers: {
@@ -31,20 +33,49 @@ async function callGroqWithFallback(apiKey, systemInstructions, userPrompt) {
         })
       });
 
-      if (!response.ok) {
+      if (response.ok) {
+        const groqData = await response.json();
+        const content = groqData.choices?.[0]?.message?.content;
+        if (content) return content;
+      } else {
         const errText = await response.text();
-        console.warn(`Groq model ${modelId} failed (${response.status}): ${errText}`);
+        console.warn(`Groq model ${modelId} json_object mode failed (${response.status}): ${errText}`);
         lastError = new Error(`Groq API Error (${response.status}): ${errText}`);
-        continue; // Try next model in list
-      }
-
-      const groqData = await response.json();
-      const content = groqData.choices?.[0]?.message?.content;
-      if (content) {
-        return content;
       }
     } catch (err) {
       console.warn(`Error calling Groq model ${modelId}:`, err.message);
+      lastError = err;
+    }
+
+    // Attempt 2: Standard mode (without response_format)
+    try {
+      console.log(`Attempting Groq API with model ${modelId} (standard prompt mode)...`);
+      const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${apiKey}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          model: modelId,
+          messages: [
+            { role: 'system', content: systemInstructions },
+            { role: 'user', content: `${userPrompt}\n\nRespond strictly in valid JSON format.` }
+          ]
+        })
+      });
+
+      if (response.ok) {
+        const groqData = await response.json();
+        const content = groqData.choices?.[0]?.message?.content;
+        if (content) return content;
+      } else {
+        const errText = await response.text();
+        console.warn(`Groq model ${modelId} standard mode failed (${response.status}): ${errText}`);
+        lastError = new Error(`Groq API Error (${response.status}): ${errText}`);
+      }
+    } catch (err) {
+      console.warn(`Error calling Groq model ${modelId} standard mode:`, err.message);
       lastError = err;
     }
   }
@@ -78,7 +109,7 @@ export async function POST(req) {
 
     const systemInstructions = `
 You are an expert travel planner assistant.
-Generate a realistic, day-by-day travel itinerary based on the user request.
+Generate a realistic, day-by-day travel itinerary based on the user request in JSON format.
 
 REQUIRED SCHEMAS & FEATURES:
 1. Include "companionType": "${companionType}".
@@ -136,7 +167,7 @@ Required JSON Schema:
   ]
 }
 
-Return ONLY raw JSON.
+Return ONLY raw JSON object.
 `;
 
     let responseText = null;
