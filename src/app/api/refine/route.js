@@ -32,7 +32,7 @@ async function callGeminiWithFallback(apiKey, systemInstructions, userPrompt) {
     try {
       console.log(`Calling Official Gemini REST API refine with model: ${modelId}`);
       const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/${modelId}:generateContent?key=${apiKey}`,
+        `https://generativelanguage.googleapis.com/v1beta/models/${modelId}:generateContent?key=${apiKey.trim()}`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -78,7 +78,7 @@ async function callOpenRouterWithFallback(apiKey, systemInstructions, userPrompt
       const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${apiKey}`,
+          'Authorization': `Bearer ${apiKey.trim()}`,
           'HTTP-Referer': 'https://itinera-ai-planner.vercel.app',
           'X-Title': 'Itinera AI Travel Planner',
           'Content-Type': 'application/json'
@@ -119,7 +119,7 @@ async function callGroqWithFallback(apiKey, systemInstructions, userPrompt) {
       const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${apiKey}`,
+          'Authorization': `Bearer ${apiKey.trim()}`,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
@@ -242,7 +242,7 @@ Return ONLY raw JSON object.
     let responseText = null;
 
     // 1. Try Official Google Gemini FIRST if provided
-    if (geminiKey && geminiKey.startsWith('AIzaSy')) {
+    if (geminiKey && geminiKey.trim().length > 10 && !geminiKey.includes('your_gemini_api_key')) {
       try {
         responseText = await callGeminiWithFallback(
           geminiKey, 
@@ -255,7 +255,7 @@ Return ONLY raw JSON object.
     }
 
     // 2. Try OpenRouter as fallback
-    if (!responseText && openRouterKey && openRouterKey.startsWith('sk-or-v1-')) {
+    if (!responseText && openRouterKey && openRouterKey.trim().length > 10 && !openRouterKey.includes('your_api_key')) {
       try {
         responseText = await callOpenRouterWithFallback(
           openRouterKey,
@@ -268,7 +268,7 @@ Return ONLY raw JSON object.
     }
 
     // 3. Try Groq as fallback
-    if (!responseText && groqKey && groqKey.startsWith('gsk_')) {
+    if (!responseText && groqKey && groqKey.trim().length > 10 && !groqKey.includes('your_groq_api_key')) {
       try {
         responseText = await callGroqWithFallback(
           groqKey, 
