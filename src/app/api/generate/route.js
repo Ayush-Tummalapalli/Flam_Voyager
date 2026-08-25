@@ -1,6 +1,12 @@
-import { GoogleGenerativeAI } from '@google/generative-ai';
 import { validateAndCleanItinerary } from '@/lib/schemaValidator';
 import { getMockItinerary } from '@/lib/mockItinerary';
+
+const GEMINI_MODELS = [
+  'gemini-2.0-flash',
+  'gemini-1.5-flash',
+  'gemini-1.5-flash-latest',
+  'gemini-1.5-pro'
+];
 
 const OPENROUTER_MODELS = [
   'meta-llama/llama-3.3-70b-instruct:free',
@@ -18,6 +24,50 @@ const GROQ_MODELS = [
   'llama3-70b-8192',
   'mixtral-8x7b-32768'
 ];
+
+async function callGeminiWithFallback(apiKey, systemInstructions, userPrompt) {
+  let lastError = null;
+
+  for (const modelId of GEMINI_MODELS) {
+    try {
+      console.log(`Calling Official Gemini REST API with model: ${modelId}`);
+      const response = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/${modelId}:generateContent?key=${apiKey}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [
+              {
+                parts: [
+                  { text: `${systemInstructions}\n\nUser Request: "${userPrompt}"` }
+                ]
+              }
+            ],
+            generationConfig: {
+              responseMimeType: 'application/json'
+            }
+          })
+        }
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        const content = data.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (content) return content;
+      } else {
+        const errText = await response.text();
+        console.warn(`Gemini model ${modelId} failed (${response.status}): ${errText}`);
+        lastError = new Error(`Gemini API Error (${response.status}): ${errText}`);
+      }
+    } catch (err) {
+      console.warn(`Error calling Gemini model ${modelId}:`, err.message);
+      lastError = err;
+    }
+  }
+
+  throw lastError || new Error('All Gemini models failed to return a response.');
+}
 
 async function callOpenRouterWithFallback(apiKey, systemInstructions, userPrompt) {
   let lastError = null;
@@ -184,19 +234,10 @@ Return ONLY raw JSON object.
 
     let responseText = null;
 
-    // 1. Try Google Gemini FIRST if provided
-    if (geminiKey && !geminiKey.includes('your_gemini_api_key')) {
+    // 1. Try Official Google Gemini FIRST if provided
+    if (geminiKey && geminiKey.startsWith('AIzaSy')) {
       try {
-        console.log(`Calling Official Google Gemini API...`);
-        const genAI = new GoogleGenerativeAI(geminiKey);
-        const model = genAI.getGenerativeModel({
-          model: 'gemini-1.5-flash',
-          generationConfig: { responseMimeType: 'application/json' }
-        });
-
-        const fullPrompt = `${systemInstructions}\n\nUser request: "${userPrompt.replace(/"/g, '\\"')}"`;
-        const result = await model.generateContent(fullPrompt);
-        responseText = result.response.text();
+        responseText = await callGeminiWithFallback(geminiKey, systemInstructions, userPrompt);
       } catch (err) {
         console.warn('Official Gemini API call failed, falling back to other providers:', err.message);
       }
