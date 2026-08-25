@@ -3,6 +3,8 @@ import { validateAndCleanItinerary } from '@/lib/schemaValidator';
 import { getMockItinerary } from '@/lib/mockItinerary';
 
 const OPENROUTER_MODELS = [
+  'google/gemma-4-26b-a4b-it:free',
+  'google/gemma-4-31b-it:free',
   'google/gemma-4-31b:free',
   'google/gemma-4-26b-a4b:free',
   'nvidia/nemotron-3.5-lightning:free'
@@ -143,7 +145,7 @@ USER REFINEMENT INSTRUCTION:
 
 CRITICAL INSTRUCTIONS:
 1. Update the itinerary based on the refinement instruction.
-2. Preserve or update "packingChecklist" (documents, clothing, electronics, essentials).
+2. Preserve or update "packingChecklist" (documents, clothing, essentials).
 3. Preserve or update "weatherAdvisor", "estimatedBudgetPerPax", and "budgetBreakdown".
 
 Schema MUST match:

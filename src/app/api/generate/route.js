@@ -3,6 +3,8 @@ import { validateAndCleanItinerary } from '@/lib/schemaValidator';
 import { getMockItinerary } from '@/lib/mockItinerary';
 
 const OPENROUTER_MODELS = [
+  'google/gemma-4-26b-a4b-it:free',
+  'google/gemma-4-31b-it:free',
   'google/gemma-4-31b:free',
   'google/gemma-4-26b-a4b:free',
   'nvidia/nemotron-3.5-lightning:free'
