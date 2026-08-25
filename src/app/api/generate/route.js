@@ -3,10 +3,11 @@ import { validateAndCleanItinerary } from '@/lib/schemaValidator';
 import { getMockItinerary } from '@/lib/mockItinerary';
 
 const OPENROUTER_MODELS = [
+  'meta-llama/llama-3.3-70b-instruct:free',
+  'qwen/qwen-2.5-coder-32b-instruct:free',
   'google/gemma-4-26b-a4b-it:free',
   'google/gemma-4-31b-it:free',
-  'google/gemma-4-31b:free',
-  'google/gemma-4-26b-a4b:free',
+  'mistralai/mistral-7b-instruct:free',
   'nvidia/nemotron-3.5-lightning:free'
 ];
 
@@ -114,13 +115,9 @@ export async function POST(req) {
       );
     }
 
-    const apiKey = process.env.OPENROUTER_API_KEY || process.env.GROQ_API_KEY || process.env.GEMINI_API_KEY;
-
-    if (!apiKey || apiKey.includes('your_api_key')) {
-      console.warn('API Key is missing or default. Returning fallback mock data.');
-      const mockData = getMockItinerary(userPrompt, null, companionType);
-      return Response.json({ success: true, data: mockData });
-    }
+    const openRouterKey = process.env.OPENROUTER_API_KEY;
+    const groqKey = process.env.GROQ_API_KEY;
+    const geminiKey = process.env.GEMINI_API_KEY;
 
     const systemInstructions = `
 You are an expert travel planner assistant.
@@ -187,25 +184,46 @@ Return ONLY raw JSON object.
 
     let responseText = null;
 
-    if (apiKey.startsWith('sk-or-v1-')) {
-      responseText = await callOpenRouterWithFallback(apiKey, systemInstructions, userPrompt);
-    } else if (apiKey.startsWith('gsk_')) {
-      responseText = await callGroqWithFallback(apiKey, systemInstructions, userPrompt);
-    } else {
-      console.log(`Calling Google Gemini API...`);
-      const genAI = new GoogleGenerativeAI(apiKey);
-      const model = genAI.getGenerativeModel({
-        model: 'gemini-1.5-flash',
-        generationConfig: { responseMimeType: 'application/json' }
-      });
+    // Try OpenRouter first if available
+    if (openRouterKey && openRouterKey.startsWith('sk-or-v1-')) {
+      try {
+        responseText = await callOpenRouterWithFallback(openRouterKey, systemInstructions, userPrompt);
+      } catch (err) {
+        console.warn('OpenRouter cascade failed, trying backup providers:', err.message);
+      }
+    }
 
-      const fullPrompt = `${systemInstructions}\n\nUser request: "${userPrompt.replace(/"/g, '\\"')}"`;
-      const result = await model.generateContent(fullPrompt);
-      responseText = result.response.text();
+    // Try Groq as fallback
+    if (!responseText && groqKey && groqKey.startsWith('gsk_')) {
+      try {
+        responseText = await callGroqWithFallback(groqKey, systemInstructions, userPrompt);
+      } catch (err) {
+        console.warn('Groq cascade failed, trying Gemini provider:', err.message);
+      }
+    }
+
+    // Try Gemini as fallback
+    if (!responseText && geminiKey && !geminiKey.includes('your_gemini_api_key')) {
+      try {
+        console.log(`Calling Google Gemini API...`);
+        const genAI = new GoogleGenerativeAI(geminiKey);
+        const model = genAI.getGenerativeModel({
+          model: 'gemini-1.5-flash',
+          generationConfig: { responseMimeType: 'application/json' }
+        });
+
+        const fullPrompt = `${systemInstructions}\n\nUser request: "${userPrompt.replace(/"/g, '\\"')}"`;
+        const result = await model.generateContent(fullPrompt);
+        responseText = result.response.text();
+      } catch (err) {
+        console.warn('Gemini API call failed:', err.message);
+      }
     }
 
     if (!responseText) {
-      throw new Error('Received empty response from AI service.');
+      console.warn('All AI services failed or API key missing. Returning fallback mock data.');
+      const mockData = getMockItinerary(userPrompt || 'Custom Trip', null, companionType);
+      return Response.json({ success: true, data: mockData });
     }
 
     let cleanedText = responseText.trim();

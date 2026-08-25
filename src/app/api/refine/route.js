@@ -3,10 +3,11 @@ import { validateAndCleanItinerary } from '@/lib/schemaValidator';
 import { getMockItinerary } from '@/lib/mockItinerary';
 
 const OPENROUTER_MODELS = [
+  'meta-llama/llama-3.3-70b-instruct:free',
+  'qwen/qwen-2.5-coder-32b-instruct:free',
   'google/gemma-4-26b-a4b-it:free',
   'google/gemma-4-31b-it:free',
-  'google/gemma-4-31b:free',
-  'google/gemma-4-26b-a4b:free',
+  'mistralai/mistral-7b-instruct:free',
   'nvidia/nemotron-3.5-lightning:free'
 ];
 
@@ -121,17 +122,9 @@ export async function POST(req) {
       );
     }
 
-    const apiKey = process.env.OPENROUTER_API_KEY || process.env.GROQ_API_KEY || process.env.GEMINI_API_KEY;
-
-    if (!apiKey || apiKey.includes('your_api_key')) {
-      console.warn('API Key is missing. Returning modified fallback mock data.');
-      const mockData = getMockItinerary(
-        `${existingItinerary.destination || 'Trip'} (${userInstruction})`,
-        null,
-        existingItinerary.companionType || 'Solo Traveler'
-      );
-      return Response.json({ success: true, data: mockData });
-    }
+    const openRouterKey = process.env.OPENROUTER_API_KEY;
+    const groqKey = process.env.GROQ_API_KEY;
+    const geminiKey = process.env.GEMINI_API_KEY;
 
     const systemInstructions = `
 You are an expert travel planner assistant.
@@ -198,32 +191,57 @@ Return ONLY raw JSON object.
 
     let responseText = null;
 
-    if (apiKey.startsWith('sk-or-v1-')) {
-      responseText = await callOpenRouterWithFallback(
-        apiKey,
-        systemInstructions,
-        `Please update the itinerary following this instruction: "${userInstruction}"`
-      );
-    } else if (apiKey.startsWith('gsk_')) {
-      responseText = await callGroqWithFallback(
-        apiKey, 
-        systemInstructions, 
-        `Please update the itinerary following this instruction: "${userInstruction}"`
-      );
-    } else {
-      console.log('Refining via Google Gemini API engine...');
-      const genAI = new GoogleGenerativeAI(apiKey);
-      const model = genAI.getGenerativeModel({
-        model: 'gemini-1.5-flash',
-        generationConfig: { responseMimeType: 'application/json' }
-      });
+    // Try OpenRouter first if available
+    if (openRouterKey && openRouterKey.startsWith('sk-or-v1-')) {
+      try {
+        responseText = await callOpenRouterWithFallback(
+          openRouterKey,
+          systemInstructions,
+          `Please update the itinerary following this instruction: "${userInstruction}"`
+        );
+      } catch (err) {
+        console.warn('OpenRouter refine cascade failed, trying backup providers:', err.message);
+      }
+    }
 
-      const result = await model.generateContent(systemInstructions);
-      responseText = result.response.text();
+    // Try Groq as fallback
+    if (!responseText && groqKey && groqKey.startsWith('gsk_')) {
+      try {
+        responseText = await callGroqWithFallback(
+          groqKey, 
+          systemInstructions, 
+          `Please update the itinerary following this instruction: "${userInstruction}"`
+        );
+      } catch (err) {
+        console.warn('Groq refine cascade failed, trying Gemini provider:', err.message);
+      }
+    }
+
+    // Try Gemini as fallback
+    if (!responseText && geminiKey && !geminiKey.includes('your_gemini_api_key')) {
+      try {
+        console.log('Refining via Google Gemini API engine...');
+        const genAI = new GoogleGenerativeAI(geminiKey);
+        const model = genAI.getGenerativeModel({
+          model: 'gemini-1.5-flash',
+          generationConfig: { responseMimeType: 'application/json' }
+        });
+
+        const result = await model.generateContent(systemInstructions);
+        responseText = result.response.text();
+      } catch (err) {
+        console.warn('Gemini refine API call failed:', err.message);
+      }
     }
 
     if (!responseText) {
-      throw new Error('Received empty response from AI model during refinement.');
+      console.warn('All AI refine services failed. Returning modified fallback mock data.');
+      const mockData = getMockItinerary(
+        userInstruction || 'Refined Trip',
+        null,
+        existingItinerary?.companionType || 'Solo Traveler'
+      );
+      return Response.json({ success: true, data: mockData });
     }
 
     let cleanedText = responseText.trim();
