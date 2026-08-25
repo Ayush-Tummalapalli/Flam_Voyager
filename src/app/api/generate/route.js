@@ -115,9 +115,9 @@ export async function POST(req) {
       );
     }
 
+    const geminiKey = process.env.GEMINI_API_KEY;
     const openRouterKey = process.env.OPENROUTER_API_KEY;
     const groqKey = process.env.GROQ_API_KEY;
-    const geminiKey = process.env.GEMINI_API_KEY;
 
     const systemInstructions = `
 You are an expert travel planner assistant.
@@ -184,28 +184,10 @@ Return ONLY raw JSON object.
 
     let responseText = null;
 
-    // Try OpenRouter first if available
-    if (openRouterKey && openRouterKey.startsWith('sk-or-v1-')) {
+    // 1. Try Google Gemini FIRST if provided
+    if (geminiKey && !geminiKey.includes('your_gemini_api_key')) {
       try {
-        responseText = await callOpenRouterWithFallback(openRouterKey, systemInstructions, userPrompt);
-      } catch (err) {
-        console.warn('OpenRouter cascade failed, trying backup providers:', err.message);
-      }
-    }
-
-    // Try Groq as fallback
-    if (!responseText && groqKey && groqKey.startsWith('gsk_')) {
-      try {
-        responseText = await callGroqWithFallback(groqKey, systemInstructions, userPrompt);
-      } catch (err) {
-        console.warn('Groq cascade failed, trying Gemini provider:', err.message);
-      }
-    }
-
-    // Try Gemini as fallback
-    if (!responseText && geminiKey && !geminiKey.includes('your_gemini_api_key')) {
-      try {
-        console.log(`Calling Google Gemini API...`);
+        console.log(`Calling Official Google Gemini API...`);
         const genAI = new GoogleGenerativeAI(geminiKey);
         const model = genAI.getGenerativeModel({
           model: 'gemini-1.5-flash',
@@ -216,7 +198,25 @@ Return ONLY raw JSON object.
         const result = await model.generateContent(fullPrompt);
         responseText = result.response.text();
       } catch (err) {
-        console.warn('Gemini API call failed:', err.message);
+        console.warn('Official Gemini API call failed, falling back to other providers:', err.message);
+      }
+    }
+
+    // 2. Try OpenRouter as fallback
+    if (!responseText && openRouterKey && openRouterKey.startsWith('sk-or-v1-')) {
+      try {
+        responseText = await callOpenRouterWithFallback(openRouterKey, systemInstructions, userPrompt);
+      } catch (err) {
+        console.warn('OpenRouter cascade failed, trying Groq:', err.message);
+      }
+    }
+
+    // 3. Try Groq as fallback
+    if (!responseText && groqKey && groqKey.startsWith('gsk_')) {
+      try {
+        responseText = await callGroqWithFallback(groqKey, systemInstructions, userPrompt);
+      } catch (err) {
+        console.warn('Groq cascade failed:', err.message);
       }
     }
 
