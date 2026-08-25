@@ -2,10 +2,10 @@ import { validateAndCleanItinerary } from '@/lib/schemaValidator';
 import { getMockItinerary } from '@/lib/mockItinerary';
 
 const GEMINI_MODELS = [
-  'gemini-3.6-flash',
+  'gemini-flash-lite-latest',
+  'gemini-2.5-flash-lite',
   'gemini-2.5-flash',
-  'gemini-2.0-flash',
-  'gemini-1.5-flash'
+  'gemini-3.6-flash'
 ];
 
 const OPENROUTER_MODELS = [
